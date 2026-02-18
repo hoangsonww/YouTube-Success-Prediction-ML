@@ -57,6 +57,7 @@ This `README.md` is only the operational entrypoint. For detailed design and sub
 ![GNU Make](https://img.shields.io/badge/GNU%20Make-Automation-6C6C6C?style=for-the-badge&logo=gnu&logoColor=white)
 ![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Diagrams-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 ## Table Of Contents
 
@@ -111,6 +112,8 @@ This repository contains multiple documentation assets for different audiences a
 | [infra/k8s/README.md](infra/k8s/README.md) | Kubernetes manifests and overlays | You are editing cluster runtime resources |
 | [infra/argocd/README.md](infra/argocd/README.md) | GitOps strategy apps | You are switching rollout modes in Argo CD |
 | [infra/terraform/README.md](infra/terraform/README.md) | Multi-cloud IaC packs | You are provisioning or updating cloud environments |
+
+**Demo Frontend:** [https://youtube-success.vercel.app](https://youtube-success.vercel.app)
 
 ## Project Overview
 
@@ -299,6 +302,7 @@ The platform is built with the following technologies, chosen for their producti
 
 - `Next.js 14`
 - `TypeScript`
+- Vercel
 
 ### DevOps / Delivery
 
@@ -311,6 +315,7 @@ The platform is built with the following technologies, chosen for their producti
 - Argo CD + Argo Rollouts (`infra/argocd`, `infra/k8s/overlays`)
 - Terraform multi-cloud packs (`infra/terraform`)
 - Kubernetes Kustomize overlays (`infra/k8s`)
+- AWS, Azure, OCI, and GCP support
 
 ### GitHub Actions CI/CD
 
@@ -456,6 +461,9 @@ cd frontend
 npm install
 npm run dev
 ```
+
+> [!TIP]
+> A demo frontend is also available at [https://youtube-success.vercel.app](https://youtube-success.vercel.app). Only the UI demo is available. For it to be fully functional, please set up the backend API and ML serving locally.
 
 ## Environment Configuration
 
