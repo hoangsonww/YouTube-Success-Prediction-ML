@@ -516,7 +516,8 @@ export async function predictBatch(items: PredictionPayload[]): Promise<BatchPre
       records,
       summary: {
         count: records.length,
-        avg_predicted_subscribers: records.reduce((acc, r) => acc + r.predicted_subscribers, 0) / count,
+        avg_predicted_subscribers:
+          records.reduce((acc, r) => acc + r.predicted_subscribers, 0) / count,
         avg_predicted_earnings: records.reduce((acc, r) => acc + r.predicted_earnings, 0) / count,
         avg_predicted_growth: records.reduce((acc, r) => acc + r.predicted_growth, 0) / count,
       },
@@ -549,7 +550,9 @@ export async function simulatePrediction(payload: SimulationRequest): Promise<Si
       });
     }
     const bestByGrowth = [...points].sort((a, b) => b.predicted_growth - a.predicted_growth)[0];
-    const bestByEarnings = [...points].sort((a, b) => b.predicted_earnings - a.predicted_earnings)[0];
+    const bestByEarnings = [...points].sort(
+      (a, b) => b.predicted_earnings - a.predicted_earnings
+    )[0];
     return {
       input: payload,
       points,
@@ -574,8 +577,9 @@ export async function getRecommendation(
     markOfflineFallbackMode();
     const prediction = buildFallbackPrediction(payload);
     const cluster =
-      FALLBACK_CLUSTERS.find((row) => normalizeCategory(payload.category) === row.dominant_category) ??
-      FALLBACK_CLUSTERS[0];
+      FALLBACK_CLUSTERS.find(
+        (row) => normalizeCategory(payload.category) === row.dominant_category
+      ) ?? FALLBACK_CLUSTERS[0];
     const riskLevel: RecommendationResponse["risk_level"] =
       payload.age >= 12 || payload.uploads < 80 ? "high" : payload.uploads < 250 ? "medium" : "low";
     return {

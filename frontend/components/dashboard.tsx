@@ -106,7 +106,9 @@ export function Dashboard() {
           {dataLoading ? (
             <span className="skeletonText skeletonMd" aria-hidden="true" />
           ) : (
-            <strong className="statValue small">{leadingCluster?.archetype ?? "Unavailable"}</strong>
+            <strong className="statValue small">
+              {leadingCluster?.archetype ?? "Unavailable"}
+            </strong>
           )}
           <p className="statMeta">Largest current channel behavior segment.</p>
         </article>
