@@ -25,6 +25,7 @@ This project ships a full multi-cloud deployment stack with:
 - [10) Required Cluster Add-ons](#10-required-cluster-add-ons)
 - [11) Production Readiness Checklist](#11-production-readiness-checklist)
 - [12) Deployment Modes Summary](#12-deployment-modes-summary)
+- [13) Frontend Deployment](#13-frontend-deployment)
 
 ## Document Metadata
 
@@ -428,3 +429,7 @@ flowchart TB
 ```
 
 For local development and testing, `docker compose` provides a quick way to run the full stack. For production deployments, the Jenkins pipeline orchestrates image building, cloud provisioning (optional), and Argo CD synchronization with the selected rollout strategy. The Terraform packs allow for flexible multi-cloud infrastructure management aligned with the deployment process.
+
+## 13) Frontend Deployment
+
+We recommend deploying frontend on Vercel due to convenience and ease of deployment. FYI, a demo frontend is available on Vercel at: [https://youtube-success.vercel.app](https://youtube-success.vercel.app). However, backend functionalities are not connected. Please run the backend API and AI/ML functionalities to enjoy all features of the platform.

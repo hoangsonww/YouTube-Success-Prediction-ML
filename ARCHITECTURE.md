@@ -40,6 +40,7 @@
 ![GNU Make](https://img.shields.io/badge/GNU%20Make-Automation-6C6C6C?style=for-the-badge&logo=gnu&logoColor=white)
 ![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Diagrams-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 ## Table Of Contents
 
