@@ -45,7 +45,12 @@ export const metadata: Metadata = {
       "Predict subscribers, earnings, and growth. Explore clustering archetypes and global YouTube intelligence.",
     siteName: "YouTube Success Prediction ML",
     images: [
-      { url: "/android-chrome-512x512.png", width: 512, height: 512, alt: "YouTube Success Prediction ML" },
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "YouTube Success Prediction ML",
+      },
     ],
   },
   twitter: {
