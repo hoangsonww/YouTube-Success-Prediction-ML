@@ -2,6 +2,9 @@
 
 This frontend is an app-router Next.js app (in `frontend/`) that consumes FastAPI endpoints and renders interactive intelligence views.
 
+> [!TIP]
+> A demo frontend is also available at [https://youtube-success.vercel.app](https://youtube-success.vercel.app). Only the UI demo is available. For it to be fully functional, please set up the backend API and ML serving locally.
+
 ## Table Of Contents
 
 - [User Interface Overview](#user-interface-overview)
@@ -13,6 +16,7 @@ This frontend is an app-router Next.js app (in `frontend/`) that consumes FastAP
 - [Charts Stack](#charts-stack)
 - [API Contract](#api-contract)
 - [Build And Validate](#build-and-validate)
+- [Deployment](#deployment)
 
 ## User Interface Overview
 
@@ -112,9 +116,19 @@ NEXT_PUBLIC_API_BASE_URL=https://api.youtube-success.example.com
 
 ## Build And Validate
 
+Run the below one-liner to quickly install all dependencies, lint, and build the frontend in one go:
+
 ```bash
 cd frontend
 npm ci
 npm run lint
 npm run build
 ```
+
+## Deployment
+
+We recommend using Vercel for frontend deployment, as it is the most compatible option with Next and TypeScript. Simply connect your fork of this project to Vercel and use the Vercel dashboard on the web to easily deploy the frontend (remember to select the code directory to be /frontend and use the Next.je preset). 
+
+> [!TIP]
+> A demo frontend is also available at [https://youtube-success.vercel.app](https://youtube-success.vercel.app). Only the UI demo is available. For it to be fully functional, please set up the backend API and ML serving locally.
+
