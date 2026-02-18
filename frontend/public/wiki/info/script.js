@@ -10,6 +10,7 @@
   const checklistInputs = Array.from(document.querySelectorAll("[data-check-item]"));
   const checklistProgress = document.getElementById("checklist-progress");
   const numberFmt = new Intl.NumberFormat("en-US");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const updateProgress = () => {
     const doc = document.documentElement;
@@ -83,13 +84,16 @@
 
   revealItems.forEach((item) => revealObserver.observe(item));
 
+  const easeOutQuint = (p) => 1 - Math.pow(1 - p, 5);
+
   const animateCounter = (el) => {
     if (el.dataset.counted === "true") return;
     const target = Number(el.getAttribute("data-count") || "0");
     if (!Number.isFinite(target)) return;
-    const duration = Number(el.getAttribute("data-count-duration") || 1200);
+    const metricIndex = Number(el.getAttribute("data-count-index") || "0");
+    const delay = Number(el.getAttribute("data-count-delay") || metricIndex * 110);
+    const duration = Number(el.getAttribute("data-count-duration") || (target <= 10 ? 1700 : 2100));
     const start = performance.now();
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reducedMotion) {
       el.textContent = numberFmt.format(Math.round(target));
@@ -97,14 +101,27 @@
       return;
     }
 
+    let lastRendered = -1;
+
     const tick = (t) => {
-      const p = Math.min(1, (t - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = numberFmt.format(Math.round(target * eased));
+      const elapsed = t - start;
+      if (elapsed < delay) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      const p = Math.min(1, (elapsed - delay) / duration);
+      const eased = easeOutQuint(p);
+      const value = Math.round(target * eased);
+      if (value !== lastRendered) {
+        el.textContent = numberFmt.format(value);
+        lastRendered = value;
+      }
       if (p < 1) {
         requestAnimationFrame(tick);
       } else {
+        el.textContent = numberFmt.format(Math.round(target));
         el.dataset.counted = "true";
+        el.classList.add("count-complete");
       }
     };
 
@@ -122,7 +139,10 @@
     { threshold: 0.18 }
   );
 
-  document.querySelectorAll("[data-count]").forEach((el) => counterObserver.observe(el));
+  Array.from(document.querySelectorAll("[data-count]")).forEach((el, idx) => {
+    el.setAttribute("data-count-index", String(idx));
+    counterObserver.observe(el);
+  });
 
   const initMermaid = () => {
     if (typeof mermaid === "undefined") return;

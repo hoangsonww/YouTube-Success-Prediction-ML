@@ -1,0 +1,33 @@
+{
+  "name": "YouTube Success Prediction ML Wiki",
+  "short_name": "YTS ML Wiki",
+  "description": "Comprehensive platform wiki for YouTube success prediction, clustering intelligence, global analytics, and production MLOps delivery.",
+  "id": "/wiki",
+  "start_url": "/wiki",
+  "scope": "/wiki/",
+  "display": "standalone",
+  "background_color": "#0d1321",
+  "theme_color": "#0d1321",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
