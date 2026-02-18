@@ -276,6 +276,7 @@ Job topology:
 - sets:
   - `YTS_PROJECT_ROOT=${{ github.workspace }}`
   - `YTS_DATA_PATH=${{ github.workspace }}/data/Global YouTube Statistics.csv`
+  - dataset source reference: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023?resource=download)
   - `YTS_ARTIFACT_DIR=${{ github.workspace }}/artifacts`
 
 2. `🎨 Frontend Lint + Build`

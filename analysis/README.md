@@ -2,6 +2,8 @@
 
 This directory contains production-style data exploration and EDA assets.
 
+Dataset source: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023?resource=download) (local file used in this repo: `data/Global YouTube Statistics.csv`).
+
 ## Layout
 
 - `analysis/scripts/run_eda.py`: runs dataset exploration and exports EDA artifacts.

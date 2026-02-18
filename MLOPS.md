@@ -42,6 +42,7 @@ MLOps lineage in this project is dataset-aware and records the exact dataset has
 Primary source dataset:
 
 - default file: `data/Global YouTube Statistics.csv`
+- canonical source: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023?resource=download)
 - encoding: `latin-1`
 - row count: `995`
 - raw columns: `28`

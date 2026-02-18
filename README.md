@@ -138,6 +138,7 @@ It also clusters channels into strategic archetypes and produces country-level i
 Primary dataset:
 
 - file: `data/Global YouTube Statistics.csv`
+- source: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023?resource=download)
 - encoding: `latin-1`
 - rows: `995`
 - columns: `28` (raw source schema)
