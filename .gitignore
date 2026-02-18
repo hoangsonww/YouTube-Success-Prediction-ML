@@ -4,10 +4,14 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .venv/
+.dvc/
+.cache/
 artifacts/models/
 artifacts/reports/
 artifacts/maps/
 artifacts/mlops/
+mlruns/
+wandb/
 .DS_Store
 frontend/.next/
 frontend/node_modules/
