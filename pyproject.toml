@@ -29,6 +29,15 @@ dev = [
   "httpx>=0.28.0",
   "ruff>=0.6.0"
 ]
+mlops = [
+  "mlflow>=2.16.0",
+  "wandb>=0.18.0",
+  "optuna>=3.6.0",
+  "dvc>=3.55.0",
+  "feast>=0.40.0",
+  "prefect>=2.19.0",
+  "prometheus-client>=0.21.0"
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

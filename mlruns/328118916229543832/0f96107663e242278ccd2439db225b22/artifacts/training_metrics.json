@@ -1,0 +1,72 @@
+{
+  "supervised_metrics": {
+    "subscribers": {
+      "mae": 7394140.541262588,
+      "rmse": 11389244.550208032,
+      "r2": 0.025892710995223278
+    },
+    "earnings": {
+      "mae": 6132092.848655505,
+      "rmse": 12156452.901839975,
+      "r2": 0.0561337672940555
+    },
+    "growth": {
+      "mae": 210408.9350310746,
+      "rmse": 409132.2015983564,
+      "r2": -0.11366249064404377
+    }
+  },
+  "clusters": [
+    {
+      "cluster_id": 0,
+      "archetype": "High upload low growth",
+      "size": 31,
+      "avg_uploads": 174146.03225806452,
+      "avg_subscribers": 22293548.387096774,
+      "avg_earnings": 10190322.58064516,
+      "avg_growth": 246129.03225806452,
+      "dominant_category": "News & Politics"
+    },
+    {
+      "cluster_id": 1,
+      "archetype": "High earning low upload",
+      "size": 58,
+      "avg_uploads": 17159.431034482757,
+      "avg_subscribers": 36750000.0,
+      "avg_earnings": 45510344.827586204,
+      "avg_growth": 1432758.6206896552,
+      "dominant_category": "Entertainment"
+    },
+    {
+      "cluster_id": 2,
+      "archetype": "Viral entertainers",
+      "size": 5,
+      "avg_uploads": 27665.2,
+      "avg_subscribers": 180400000.0,
+      "avg_earnings": 71080000.116,
+      "avg_growth": 2400000.0,
+      "dominant_category": "Education"
+    },
+    {
+      "cluster_id": 3,
+      "archetype": "Consistent educators",
+      "size": 901,
+      "avg_uploads": 2895.7713651498334,
+      "avg_subscribers": 21246281.90899001,
+      "avg_earnings": 4145954.3278024415,
+      "avg_growth": 140914.61598224196,
+      "dominant_category": "Entertainment"
+    }
+  ],
+  "maps": {
+    "influence_map": "/Users/davidnguyen/PycharmProjects/YouTube-Success-ML/artifacts/maps/influence_map.html",
+    "earnings_choropleth": "/Users/davidnguyen/PycharmProjects/YouTube-Success-ML/artifacts/maps/earnings_choropleth.html",
+    "category_dominance_map": "/Users/davidnguyen/PycharmProjects/YouTube-Success-ML/artifacts/maps/category_dominance_map.html"
+  },
+  "hpo_best_params": {
+    "n_estimators": 380,
+    "min_samples_leaf": 5,
+    "max_depth": 7
+  },
+  "hpo_best_rmse": 11347144.159407305
+}

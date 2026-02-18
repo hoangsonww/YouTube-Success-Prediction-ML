@@ -138,3 +138,11 @@ class CountryMetricRecord(BaseModel):
     total_subscribers: float
     total_earnings: float
     dominant_category: str
+
+
+class MlopsCapabilitiesResponse(BaseModel):
+    experiment_tracking: dict[str, bool]
+    hpo: dict[str, bool]
+    feature_store: dict[str, bool]
+    orchestration: dict[str, bool]
+    monitoring: dict[str, bool]

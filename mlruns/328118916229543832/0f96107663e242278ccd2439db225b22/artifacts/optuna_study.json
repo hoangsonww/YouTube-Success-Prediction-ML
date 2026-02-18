@@ -1,0 +1,11 @@
+{
+  "study_name": "yts-supervised-hpo",
+  "best_params": {
+    "n_estimators": 380,
+    "min_samples_leaf": 5,
+    "max_depth": 7
+  },
+  "best_value": 11347144.159407305,
+  "n_trials": 25,
+  "direction": "MINIMIZE"
+}

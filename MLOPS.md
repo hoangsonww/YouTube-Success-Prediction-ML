@@ -9,6 +9,14 @@ Below is the MLOps guide for the YouTube Success Prediction ML Platform, detaili
 - [Dataset Overview](#dataset-overview)
 - [Artifact Lifecycle](#artifact-lifecycle)
 - [Manifest + Registry](#manifest--registry)
+- [MLOps Capability Matrix](#mlops-capability-matrix)
+- [Enablement Profiles](#enablement-profiles)
+- [Experiment Tracking](#experiment-tracking)
+- [Hyperparameter Optimization](#hyperparameter-optimization)
+- [Feature Store And Data Versioning](#feature-store-and-data-versioning)
+- [Scheduled Retraining Orchestration](#scheduled-retraining-orchestration)
+- [Monitoring Stack](#monitoring-stack)
+- [MLOps Capability Endpoint](#mlops-capability-endpoint)
 - [Drift Operations](#drift-operations)
 - [Training And Registry Update Sequence](#training-and-registry-update-sequence)
 - [Drift Response Policy](#drift-response-policy)
@@ -93,6 +101,7 @@ Generated files:
 - `artifacts/reports/training_metrics.json`
 - `artifacts/reports/data_quality_report.json`
 - `artifacts/reports/training_baseline.json`
+- `artifacts/reports/feature_store_snapshot.csv`
 - `artifacts/mlops/training_manifest.json`
 - `artifacts/mlops/model_registry.json`
 
@@ -114,6 +123,165 @@ Tracks run history and active run pointer:
 
 - `active_run_id`
 - chronological run records
+
+## MLOps Capability Matrix
+
+| Capability | Status in repo | Primary files | Activation model |
+| --- | --- | --- | --- |
+| Artifact lineage + registry | Implemented | `mlops/registry.py`, `train.py` | Default |
+| Data quality + drift baseline | Implemented | `mlops/quality.py`, `mlops/drift.py` | Default |
+| Experiment tracking | Implemented | `mlops/experiments.py` | Opt-in env flags |
+| Hyperparameter optimization | Implemented | `mlops/hpo.py` | Opt-in CLI flags |
+| Feature store scaffolding | Implemented | `feature_store/feast/*` | Opt-in setup |
+| Data versioning pipeline | Implemented | `dvc.yaml`, `params.yaml` | Opt-in setup |
+| Scheduled retraining flow | Implemented | `orchestration/prefect/retraining_flow.py` | Opt-in runtime |
+| Monitoring stack | Implemented | `infra/monitoring/*`, `infra/k8s/monitoring/*` | Opt-in deployment |
+
+## Enablement Profiles
+
+### Profile 1: Default (CI-safe baseline)
+
+- no MLflow/W&B/Optuna/Prefect required
+- training and tests run with built-in stack only
+- this is the profile used by GitHub Actions quality gates
+
+### Profile 2: Extended MLOps
+
+- install: `pip install --no-build-isolation -e ".[mlops]"`
+- enable one or more:
+  - experiment tracking
+  - Optuna HPO
+  - Prefect retraining orchestration
+  - DVC/Feast workflows
+  - Prometheus/Grafana observability
+
+### Profile 3: Production control-plane
+
+- run training + drift checks + capability endpoint checks
+- deploy monitoring stack
+- schedule retraining flows
+- gate promotion on readiness + strategy rollout health
+
+## Experiment Tracking
+
+The training pipeline now supports optional experiment tracking backends:
+
+- `MLflow` (`YTS_ENABLE_MLFLOW=true`)
+- `Weights & Biases` (`YTS_ENABLE_WANDB=true`)
+
+Implementation:
+
+- tracker module: `src/youtube_success_ml/mlops/experiments.py`
+- integration point: `src/youtube_success_ml/train.py`
+
+Logged payloads when enabled:
+
+- training parameters
+- supervised metrics
+- key artifacts:
+  - `training_metrics.json`
+  - `data_quality_report.json`
+  - `training_baseline.json`
+  - `feature_store_snapshot.csv`
+
+Runtime flags:
+
+- `YTS_ENABLE_MLFLOW=true`
+- `YTS_ENABLE_WANDB=true`
+- `YTS_EXPERIMENT_TRACKING_STRICT=true` to fail fast when backend package is missing
+
+## Hyperparameter Optimization
+
+Optuna integration is optional and activated via CLI:
+
+```bash
+PYTHONPATH=src python -m youtube_success_ml.train --run-all --optuna-trials 25
+```
+
+Implementation:
+
+- HPO module: `src/youtube_success_ml/mlops/hpo.py`
+- output artifact: `artifacts/reports/optuna_study.json`
+
+The tuned parameters are fed back into supervised training for the same run.
+
+Additional flags:
+
+- `--optuna-timeout-seconds`
+- `--optuna-storage`
+- `--optuna-study-name`
+
+## Feature Store And Data Versioning
+
+Data versioning and feature store scaffolding is included in-repo:
+
+- DVC pipeline:
+  - `dvc.yaml`
+  - `params.yaml`
+- Feast feature repo:
+  - `feature_store/feast/feature_store.yaml`
+  - `feature_store/feast/feature_repo.py`
+- snapshot export script:
+  - `scripts/mlops/export_feature_store_snapshot.py`
+
+Quickstart:
+
+```bash
+source .venv/bin/activate
+pip install --no-build-isolation -e ".[mlops]"
+PYTHONPATH=src python scripts/mlops/export_feature_store_snapshot.py
+```
+
+## Scheduled Retraining Orchestration
+
+Scheduled retraining flow is implemented with Prefect:
+
+- flow: `orchestration/prefect/retraining_flow.py`
+- launcher script: `scripts/mlops/run_prefect_retraining.sh`
+
+Flow behavior:
+
+- executes `run_training(...)`
+- validates artifact outputs
+- supports retries for training task
+
+## Monitoring Stack
+
+The repository now contains deployable monitoring assets:
+
+- local compose stack: `docker-compose.monitoring.yml`
+- Prometheus config: `infra/monitoring/prometheus/prometheus.yml`
+- Grafana provisioning + dashboard:
+  - `infra/monitoring/grafana/provisioning`
+  - `infra/monitoring/grafana/dashboards/yts-api-observability.json`
+- Kubernetes monitoring overlay:
+  - `infra/k8s/monitoring`
+
+MLOps capability endpoint:
+
+- `GET /mlops/capabilities`
+
+## MLOps Capability Endpoint
+
+`GET /mlops/capabilities` is intended for runtime posture checks and dashboard wiring.
+
+Example shape:
+
+```json
+{
+  "experiment_tracking": {"mlflow_installed": false, "wandb_installed": false},
+  "hpo": {"optuna_installed": false},
+  "feature_store": {"dvc_project_present": true, "feast_repo_present": true},
+  "orchestration": {"prefect_installed": false, "prefect_flow_present": true},
+  "monitoring": {"prometheus_config_present": true, "grafana_dashboards_present": true}
+}
+```
+
+Operational use:
+
+- preflight checks before enabling extended profiles
+- release dashboard signal for MLOps extension readiness
+- environment parity checks (local/staging/prod)
 
 ## Drift Operations
 
@@ -165,6 +333,9 @@ flowchart TD
 - enforce schema versioning around training + inference contracts
 - alert on repeated high-severity drift
 - promote model runs through explicit approval workflow
+- keep `mlops/capabilities` status visible in release runbooks
+- schedule periodic retraining with bounded concurrency and approval gates
+- enforce monitoring baseline (Prometheus scrape healthy + Grafana datasource ready)
 
 ## Governance Checklist
 

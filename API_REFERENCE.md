@@ -61,7 +61,8 @@ flowchart TD
     N["/mlops/manifest"]
     O["/mlops/registry"]
     P["/mlops/drift-check"]
-    Q["/metrics"]
+    Q["/mlops/capabilities"]
+    R["/metrics"]
 ```
 
 ## Endpoint Domains
@@ -84,7 +85,8 @@ flowchart LR
     D[MLOps Domain] --> D1["/mlops/manifest"]
     D --> D2["/mlops/registry"]
     D --> D3["/mlops/drift-check"]
-    D --> D4["/metrics"]
+    D --> D4["/mlops/capabilities"]
+    D --> D5["/metrics"]
 ```
 
 ## Core Contracts
@@ -192,6 +194,16 @@ Response:
 
 - summary (`is_drift_risk`, high severity count)
 - per-record warnings and severity
+
+### GET `/mlops/capabilities`
+
+Returns runtime visibility into installed/available MLOps extensions:
+
+- experiment tracking backend availability (`mlflow`, `wandb`)
+- HPO engine availability (`optuna`)
+- feature store/data versioning assets (`dvc`, `feast` repository)
+- orchestration assets (Prefect flow presence)
+- monitoring asset presence (Prometheus/Grafana configs)
 
 ### GET `/analytics/category-performance`
 

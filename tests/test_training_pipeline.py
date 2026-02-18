@@ -37,5 +37,6 @@ def test_run_training_produces_mlops_artifacts():
     assert (REPORT_DIR / "training_metrics.json").exists()
     assert (REPORT_DIR / "data_quality_report.json").exists()
     assert (REPORT_DIR / "training_baseline.json").exists()
+    assert (REPORT_DIR / "feature_store_snapshot.csv").exists()
     assert MANIFEST_PATH.exists()
     assert REGISTRY_PATH.exists()

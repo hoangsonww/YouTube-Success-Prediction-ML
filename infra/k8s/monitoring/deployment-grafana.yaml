@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.2.0
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+          volumeMounts:
+            - name: provisioning
+              mountPath: /etc/grafana/provisioning/datasources/datasource.yml
+              subPath: datasource.yml
+            - name: provisioning
+              mountPath: /etc/grafana/provisioning/dashboards/dashboard.yml
+              subPath: dashboard.yml
+            - name: provisioning
+              mountPath: /var/lib/grafana/dashboards/yts-api-observability.json
+              subPath: yts-api-observability.json
+      volumes:
+        - name: provisioning
+          configMap:
+            name: grafana-provisioning

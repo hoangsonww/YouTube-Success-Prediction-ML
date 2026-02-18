@@ -6,6 +6,7 @@
 - [Documentation Map](#documentation-map)
 - [Base](#base)
 - [Overlays](#overlays)
+- [Monitoring Overlay](#monitoring-overlay)
 - [Strategy Selection](#strategy-selection)
 
 ## Document Metadata
@@ -27,6 +28,7 @@
 | [`../README.md`](../README.md) | Infrastructure index | You need infra-level navigation |
 | [`../argocd/README.md`](../argocd/README.md) | GitOps strategy app wiring | You need Argo app alignment with overlays |
 | [`../terraform/README.md`](../terraform/README.md) | Cloud foundations | You need IaC context behind cluster/runtime resources |
+| [`../monitoring/README.md`](../monitoring/README.md) | Prometheus/Grafana stack | You need observability deployment details |
 
 ## Base
 
@@ -51,6 +53,18 @@ Render:
 kubectl kustomize infra/k8s/overlays/rolling
 kubectl kustomize infra/k8s/overlays/canary
 kubectl kustomize infra/k8s/overlays/bluegreen
+```
+
+## Monitoring Overlay
+
+Monitoring manifests live in:
+
+- `infra/k8s/monitoring`
+
+Apply:
+
+```bash
+kubectl apply -k infra/k8s/monitoring
 ```
 
 ## Strategy Selection

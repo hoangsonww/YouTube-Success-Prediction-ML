@@ -8,6 +8,8 @@ This project ships a full multi-cloud deployment stack with:
 - GitHub Actions CI/CD pipeline for train/test/build/report + GHCR publishing.
 - Jenkins CI/CD pipeline with image build/push + infra orchestration.
 - Terraform cloud packs for AWS, GCP, Azure, and OCI.
+- Prefect retraining orchestration flow.
+- In-repo Prometheus + Grafana monitoring stack for API telemetry.
 
 ## Table Of Contents
 
@@ -26,6 +28,9 @@ This project ships a full multi-cloud deployment stack with:
 - [11) Production Readiness Checklist](#11-production-readiness-checklist)
 - [12) Deployment Modes Summary](#12-deployment-modes-summary)
 - [13) Frontend Deployment](#13-frontend-deployment)
+- [14) Scheduled Retraining Orchestration](#14-scheduled-retraining-orchestration)
+- [15) Monitoring Stack](#15-monitoring-stack)
+- [16) MLOps Extension Deployment Matrix](#16-mlops-extension-deployment-matrix)
 
 ## Document Metadata
 
@@ -263,6 +268,12 @@ OCI:
 
 Workflow file: `.github/workflows/ci.yml`
 
+Stability note:
+
+- This repository keeps GitHub Actions quality gates intentionally lean and deterministic.
+- Advanced MLOps extensions are opt-in and do not alter default CI pass criteria.
+- Current default CI remains: train/test, frontend lint/build, GHCR publish, pipeline report.
+
 Purpose:
 
 - enforce backend ML quality gates and frontend quality gates
@@ -380,6 +391,16 @@ Existing Docker setup remains first-class and is the source for production image
 
 Jenkins and GitHub Actions both use the same Dockerfiles for image publishing.
 
+Monitoring compose profile:
+
+- `docker-compose.monitoring.yml`
+
+Run:
+
+```bash
+docker compose -f docker-compose.monitoring.yml up -d
+```
+
 ## 10) Required Cluster Add-ons
 
 Install before canary/bluegreen production rollout:
@@ -441,3 +462,70 @@ We recommend deploying frontend on Vercel due to convenience and ease of deploym
 FYI, a demo frontend is available on Vercel at: [https://youtube-success.vercel.app](https://youtube-success.vercel.app). However, backend functionalities are not connected. Please run the backend API and AI/ML functionalities to enjoy all features of the platform.
 
 To deploy on Vercel, simply connect your fork of the repository to Vercel, select the frontend directory as the project root, and use the Next.js preset. Set the environment variable `NEXT_PUBLIC_API_BASE_URL` to point to your deployed API host for full functionality.
+
+## 14) Scheduled Retraining Orchestration
+
+Prefect-based scheduled retraining is included:
+
+- flow: `orchestration/prefect/retraining_flow.py`
+- launcher: `scripts/mlops/run_prefect_retraining.sh`
+- make target: `make prefect-retrain`
+
+Recommended deployment pattern:
+
+1. run Prefect workers in your platform namespace
+2. schedule daily retraining with controlled concurrency
+3. store run logs in your centralized logging backend
+4. gate downstream deployment with readiness checks (`/ready`)
+
+Suggested rollout:
+
+```mermaid
+flowchart LR
+    SCHED[Prefect Schedule] --> FLOW[retraining_flow.py]
+    FLOW --> TRAIN[run_training]
+    TRAIN --> ART[Manifest + Registry + Reports]
+    ART --> CHECK[Capability + Readiness Checks]
+    CHECK --> PROMOTE{Promote run?}
+    PROMOTE -- yes --> DEPLOY[Argo strategy rollout]
+    PROMOTE -- no --> HOLD[Hold for review]
+```
+
+## 15) Monitoring Stack
+
+In-repo monitoring assets:
+
+- local:
+  - `docker-compose.monitoring.yml`
+- Kubernetes:
+  - `infra/k8s/monitoring`
+- configuration:
+  - `infra/monitoring/prometheus`
+  - `infra/monitoring/grafana`
+
+Key scrape target:
+
+- `GET /metrics` on API service
+
+Operational commands:
+
+```bash
+# local stack
+make mlops-monitoring-up
+make mlops-monitoring-down
+
+# k8s stack
+kubectl apply -k infra/k8s/monitoring
+```
+
+## 16) MLOps Extension Deployment Matrix
+
+| Extension | Local activation | Kubernetes/Prod activation | Required package group |
+| --- | --- | --- | --- |
+| MLflow tracking | `YTS_ENABLE_MLFLOW=true` + tracking URI | env vars in deployment manifests/secrets | `.[mlops]` |
+| W&B tracking | `YTS_ENABLE_WANDB=true` | runtime env and secret token injection | `.[mlops]` |
+| Optuna HPO | `--optuna-trials N` on train command | pre-promotion retrain jobs | `.[mlops]` |
+| DVC pipeline | `dvc repro` | optional offline pipeline runners | `.[mlops]` |
+| Feast repo | `feast apply` in `feature_store/feast` | optional feature materialization environments | `.[mlops]` |
+| Prefect flow | `make prefect-retrain` | scheduled Prefect workers/agents | `.[mlops]` |
+| Prometheus/Grafana | `docker-compose.monitoring.yml` | `infra/k8s/monitoring` | none for app runtime |

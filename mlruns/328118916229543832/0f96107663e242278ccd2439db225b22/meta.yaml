@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/davidnguyen/PycharmProjects/YouTube-Success-ML/mlruns/328118916229543832/0f96107663e242278ccd2439db225b22/artifacts
+end_time: 1771426953502
+entry_point_name: ""
+experiment_id: "328118916229543832"
+lifecycle_stage: active
+run_id: 0f96107663e242278ccd2439db225b22
+run_name: yts-training
+source_name: ""
+source_type: 4
+source_version: ""
+start_time: 1771426942026
+status: 3
+tags: []
+user_id: davidnguyen

@@ -1,0 +1,9 @@
+2026-02-18 22:02:55,660 INFO    MainThread:1261 [wandb_setup.py:_flush():81] Current SDK version is 0.25.0
+2026-02-18 22:02:55,660 INFO    MainThread:1261 [wandb_setup.py:_flush():81] Configure stats pid to 1261
+2026-02-18 22:02:55,660 INFO    MainThread:1261 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-02-18 22:02:55,661 INFO    MainThread:1261 [wandb_init.py:setup_run_log_directory():717] Logging user logs to /Users/davidnguyen/PycharmProjects/YouTube-Success-ML/wandb/offline-run-20260218_220255-29mlhf05/logs/debug.log
+2026-02-18 22:02:55,661 INFO    MainThread:1261 [wandb_init.py:setup_run_log_directory():718] Logging internal logs to /Users/davidnguyen/PycharmProjects/YouTube-Success-ML/wandb/offline-run-20260218_220255-29mlhf05/logs/debug-internal.log
+2026-02-18 22:02:55,661 INFO    MainThread:1261 [wandb_init.py:init():844] calling init triggers
+2026-02-18 22:02:55,661 INFO    MainThread:1261 [wandb_init.py:init():849] wandb.init called with sweep_config: {}
+config: {'run_id': '20260218T150254Z-6172b96e', '_wandb': {}}
+2026-02-18 22:02:55,662 INFO    MainThread:1261 [wandb_init.py:init():892] starting backend

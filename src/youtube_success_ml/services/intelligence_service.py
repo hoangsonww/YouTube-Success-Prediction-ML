@@ -114,7 +114,9 @@ class IntelligenceService:
         risk_level = (
             "high"
             if pred["predicted_growth"] < 20_000
-            else "medium" if pred["predicted_growth"] < 120_000 else "low"
+            else "medium"
+            if pred["predicted_growth"] < 120_000
+            else "low"
         )
 
         return {

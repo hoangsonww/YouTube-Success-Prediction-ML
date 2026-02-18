@@ -419,7 +419,7 @@ flowchart LR
       <section
         id="mlops"
         class="container section reveal"
-        data-search="mlops lineage drift readiness registry manifest"
+        data-search="mlops lineage drift readiness registry manifest mlflow wandb optuna dvc feast prefect prometheus grafana capabilities"
       >
         <div class="section-head">
           <p class="kicker">Quality, Governance, Reliability</p>
@@ -432,6 +432,11 @@ flowchart LR
           <p class="section-copy">
             The lifecycle charts map how drift checks, readiness gates, rollback paths, and registry
             state interact to keep inference stable while still allowing frequent model refreshes.
+          </p>
+          <p class="section-copy">
+            Advanced controls are intentionally opt-in: MLflow/W&amp;B tracking, Optuna tuning,
+            DVC/Feast data workflows, Prefect retraining orchestration, and Prometheus/Grafana
+            observability can be enabled without destabilizing baseline CI quality gates.
           </p>
         </div>
         <div class="chart-grid">
@@ -446,6 +451,8 @@ flowchart LR
   T --> M2[clustering_bundle.joblib]
   T --> R1[training_metrics.json]
   T --> R2[data_quality_report.json]
+  T --> R3[feature_store_snapshot.csv]
+  T --> R4[optuna_study.json]
   T --> MAN[training_manifest.json]
   MAN --> REG[model_registry.json]
   REG --> ACTIVE[active_run_id]
@@ -522,6 +529,83 @@ flowchart LR
   MONITOR --> RETRAIN{"Retrain needed?"}
   RETRAIN -- yes --> TRAIN
   RETRAIN -- no --> DEPLOY
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="experiment tracking mlflow wandb training params metrics artifacts"
+          >
+            <h3>Experiment Tracking Layer</h3>
+            <pre class="mermaid">
+flowchart LR
+  TR[train.py] --> CFG[Tracking flags]
+  CFG --> MLF["MLflow backend (optional)"]
+  CFG --> WB["W&B backend (optional)"]
+  TR --> PAR[log params]
+  TR --> MET[log metrics]
+  TR --> ART[log artifacts]
+  PAR --> MLF
+  PAR --> WB
+  MET --> MLF
+  MET --> WB
+  ART --> MLF
+  ART --> WB
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="optuna hyperparameter tuning loop training"
+          >
+            <h3>Optuna Tuning Loop</h3>
+            <pre class="mermaid">
+flowchart TD
+  START[CLI --optuna-trials] --> STUDY[Create or load study]
+  STUDY --> TRIAL[Sample trial params]
+  TRIAL --> TRAINRF[Train candidate regressor]
+  TRAINRF --> SCORE[Evaluate RMSE]
+  SCORE --> BEST{Best score?}
+  BEST -- yes --> UPDATE[Update best params]
+  BEST -- no --> NEXT[Next trial]
+  UPDATE --> NEXT
+  NEXT --> STUDY
+  STUDY --> OUT[optuna_study.json + tuned config]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="dvc feast feature snapshot data versioning"
+          >
+            <h3>Feature Store And Versioning Flow</h3>
+            <pre class="mermaid">
+flowchart LR
+  RAW[Raw dataset] --> PREP[Preprocess stage]
+  PREP --> SNAP[feature_store_snapshot.csv]
+  SNAP --> DVC[dvc.yaml stages]
+  SNAP --> FEAST[Feast file source]
+  FEAST --> OFFLINE[Offline feature retrieval]
+  DVC --> LINEAGE[Data lineage + reproducibility]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="prefect retraining schedule monitoring prometheus grafana capabilities endpoint"
+          >
+            <h3>Retraining + Monitoring Control Plane</h3>
+            <pre class="mermaid">
+flowchart TB
+  PREF[Prefect schedule] --> FLOW[retraining flow]
+  FLOW --> TRAIN[run_training]
+  TRAIN --> REG[manifest + registry]
+  API[API service] --> READY["/ready"]
+  API --> MET["/metrics"]
+  API --> CAP["/mlops/capabilities"]
+  MET --> PROM[Prometheus]
+  PROM --> GRAF[Grafana]
+  READY --> FLOW
             </pre>
           </article>
         </div>

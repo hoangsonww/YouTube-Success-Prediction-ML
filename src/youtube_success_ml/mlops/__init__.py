@@ -1,1 +1,1 @@
-"""MLOps utilities for data quality, model registry, and observability."""
+"""MLOps utilities for data quality, registry, drift, experiments, and orchestration."""

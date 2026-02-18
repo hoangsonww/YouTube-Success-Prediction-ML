@@ -1,0 +1,34 @@
+stages:
+  preprocess_data:
+    cmd: make export-processed-data
+    deps:
+      - analysis/scripts/export_processed_dataset.py
+      - src/youtube_success_ml/data/loader.py
+      - data/Global YouTube Statistics.csv
+    outs:
+      - data/global_youtube_statistics_processed.csv
+
+  train_models:
+    cmd: PYTHONPATH=src .venv/bin/python -m youtube_success_ml.train --run-all --optuna-trials ${train.optuna_trials}
+    deps:
+      - src/youtube_success_ml/train.py
+      - src/youtube_success_ml/models/supervised.py
+      - src/youtube_success_ml/models/clustering.py
+      - src/youtube_success_ml/mlops/registry.py
+      - src/youtube_success_ml/mlops/drift.py
+      - src/youtube_success_ml/mlops/quality.py
+      - src/youtube_success_ml/mlops/experiments.py
+      - src/youtube_success_ml/mlops/hpo.py
+      - data/Global YouTube Statistics.csv
+    params:
+      - train
+    outs:
+      - artifacts/models/supervised_bundle.joblib
+      - artifacts/models/clustering_bundle.joblib
+      - artifacts/models/clustered_channels.csv
+      - artifacts/reports/training_metrics.json
+      - artifacts/reports/data_quality_report.json
+      - artifacts/reports/training_baseline.json
+      - artifacts/reports/feature_store_snapshot.csv
+      - artifacts/mlops/training_manifest.json
+      - artifacts/mlops/model_registry.json

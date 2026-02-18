@@ -59,6 +59,14 @@ This `README.md` is only the operational entrypoint. For detailed design and sub
 ![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Diagrams-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)
+![Weights & Biases](https://img.shields.io/badge/W%26B-Experiment%20Tracking-FFBE00?style=for-the-badge&logo=weightsandbiases&logoColor=111827)
+![Optuna](https://img.shields.io/badge/Optuna-Hyperparameter%20Search-6A5ACD?style=for-the-badge)
+![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-13ADC7?style=for-the-badge)
+![Feast](https://img.shields.io/badge/Feast-Feature%20Store-2563EB?style=for-the-badge)
+![Prefect](https://img.shields.io/badge/Prefect-Orchestration-111827?style=for-the-badge&logo=prefect&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 
 ## Table Of Contents
 
@@ -75,6 +83,7 @@ This `README.md` is only the operational entrypoint. For detailed design and sub
 - [API Reference](#api-reference)
 - [Frontend Reference](#frontend-reference)
 - [MLOps And Governance](#mlops-and-governance)
+- [MLOps Extension Runtime Controls](#mlops-extension-runtime-controls)
 - [Deployment](#deployment)
 - [Code Style And Formatting](#code-style-and-formatting)
 - [Quality Gates And Testing](#quality-gates-and-testing)
@@ -588,6 +597,7 @@ Used by frontend visualizations to compare source data and engineered model-read
 - `GET /mlops/manifest`
 - `GET /mlops/registry`
 - `POST /mlops/drift-check`
+- `GET /mlops/capabilities`
 
 ### Operational Metrics
 
@@ -629,8 +639,26 @@ Routes:
 - `artifacts/reports/training_metrics.json`
 - `artifacts/reports/data_quality_report.json`
 - `artifacts/reports/training_baseline.json`
+- `artifacts/reports/feature_store_snapshot.csv`
 - `artifacts/mlops/training_manifest.json`
 - `artifacts/mlops/model_registry.json`
+
+### Advanced MLOps Extensions
+
+- Experiment tracking:
+  - optional `MLflow` and/or `W&B` integration via environment flags
+  - training logs parameters, metrics, and selected artifacts when enabled
+- Hyperparameter optimization:
+  - optional `Optuna` orchestration with `--optuna-trials`
+  - persisted study summary in `artifacts/reports/optuna_study.json`
+- Feature store + data versioning:
+  - DVC pipeline definitions in `dvc.yaml` / `params.yaml`
+  - Feast repo definitions in `feature_store/feast`
+- Scheduled retraining orchestration:
+  - Prefect flow in `orchestration/prefect/retraining_flow.py`
+- Monitoring stack:
+  - in-repo Prometheus + Grafana assets in `infra/monitoring`
+  - local monitoring compose profile in `docker-compose.monitoring.yml`
 
 ### Manifest Semantics
 
@@ -653,15 +681,55 @@ Registry maintains:
 
 This allows deterministic model lineage and rollback decisions.
 
+## MLOps Extension Runtime Controls
+
+All advanced MLOps extensions are opt-in by design so the default CI and local developer path stays lightweight and deterministic.
+
+### Environment Flags
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `YTS_ENABLE_MLFLOW` | `false` | Enable MLflow tracking backend |
+| `YTS_ENABLE_WANDB` | `false` | Enable W&B tracking backend |
+| `YTS_EXPERIMENT_TRACKING_STRICT` | `false` | Fail run if enabled backend package is missing |
+| `MLFLOW_TRACKING_URI` | unset | MLflow backend URI |
+| `MLFLOW_EXPERIMENT_NAME` | `youtube-success-ml` | MLflow experiment name |
+| `WANDB_PROJECT` | `youtube-success-ml` | W&B project |
+| `WANDB_ENTITY` | unset | W&B org/entity |
+| `YTS_EXPERIMENT_TAGS` | unset | Comma-separated key=value tags for experiments |
+
+### Training Controls
+
+| Mode | Command | Outcome |
+| --- | --- | --- |
+| Baseline training | `PYTHONPATH=src python -m youtube_success_ml.train --run-all` | Standard artifacts + manifest/registry |
+| HPO-enabled training | `PYTHONPATH=src python -m youtube_success_ml.train --run-all --optuna-trials 25` | Adds Optuna study artifact and tuned config |
+| Feature snapshot export | `PYTHONPATH=src python scripts/mlops/export_feature_store_snapshot.py` | Emits `feature_store_snapshot.csv` |
+| Prefect retraining flow | `make prefect-retrain` | Executes scheduled-flow-compatible retraining |
+
+### Capability Discovery Endpoint
+
+`GET /mlops/capabilities` reports runtime availability/presence for:
+
+- experiment tracking backends (`mlflow`, `wandb`)
+- HPO engine (`optuna`)
+- feature stack assets (`dvc.yaml`, Feast repo files)
+- orchestration assets (Prefect flow)
+- monitoring assets (Prometheus/Grafana config)
+
 ## Deployment
 
 ### Local Runtime
 
 - `make train`
+- `make train-optuna`
 - `make test`
 - `make serve-fastapi`
 - `make frontend-dev`
 - `docker compose up --build`
+- `make mlops-monitoring-up`
+- `make mlops-monitoring-down`
+- `make prefect-retrain`
 - `make format-prettier`
 - `make format-python`
 - `make format-all`

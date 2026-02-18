@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: yts-monitoring
+
+resources:
+  - namespace.yaml
+  - configmap-prometheus.yaml
+  - deployment-prometheus.yaml
+  - service-prometheus.yaml
+  - configmap-grafana-dashboard.yaml
+  - deployment-grafana.yaml
+  - service-grafana.yaml
