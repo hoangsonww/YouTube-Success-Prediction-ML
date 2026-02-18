@@ -1,0 +1,20 @@
+groups:
+  - name: yts-api-alerts
+    rules:
+      - alert: YTSApiNoTraffic
+        expr: absent(http_requests_total{path="/predict"})
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No /predict traffic observed"
+          description: "Prometheus has not observed /predict requests for 10 minutes."
+
+      - alert: YTSApiHighLatency
+        expr: rate(http_request_latency_seconds_sum{path="/predict"}[5m]) > 2
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High cumulative latency on /predict"
+          description: "Cumulative latency rate crossed threshold for 5 minutes."

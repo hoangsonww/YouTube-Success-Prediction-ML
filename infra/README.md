@@ -31,6 +31,7 @@ This directory contains the production infrastructure and delivery stack for You
 | [`k8s/README.md`](k8s/README.md) | Kubernetes manifests and overlays | You are editing cluster runtime resources |
 | [`argocd/README.md`](argocd/README.md) | GitOps app orchestration | You are managing strategy app synchronization |
 | [`terraform/README.md`](terraform/README.md) | Cloud provisioning packs | You are planning/applying infrastructure changes |
+| [`monitoring/README.md`](monitoring/README.md) | Prometheus/Grafana stack | You are enabling observability dashboards and alerts |
 
 ## Structure
 
@@ -43,7 +44,11 @@ infra/
 |   `-- switch-strategy.sh
 |-- k8s/
 |   |-- base/
-|   `-- overlays/
+|   |-- overlays/
+|   `-- monitoring/
+|-- monitoring/
+|   |-- prometheus/
+|   `-- grafana/
 `-- terraform/
     |-- modules/
     `-- environments/
@@ -91,4 +96,11 @@ cd infra/terraform/environments/aws
 cp terraform.tfvars.example terraform.tfvars
 terraform init
 terraform plan
+```
+
+Monitoring stack:
+
+```bash
+docker compose -f docker-compose.monitoring.yml up -d
+kubectl apply -k infra/k8s/monitoring
 ```

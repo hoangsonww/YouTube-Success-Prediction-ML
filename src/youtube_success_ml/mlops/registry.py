@@ -44,6 +44,7 @@ def expected_artifacts(
         "training_metrics": report_dir / "training_metrics.json",
         "data_quality_report": report_dir / "data_quality_report.json",
         "training_baseline": report_dir / "training_baseline.json",
+        "feature_store_snapshot": report_dir / "feature_store_snapshot.csv",
         "training_manifest": MANIFEST_PATH,
     }
 

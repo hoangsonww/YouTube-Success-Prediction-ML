@@ -42,6 +42,14 @@
 ![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Diagrams-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)
+![Weights & Biases](https://img.shields.io/badge/W%26B-Experiment%20Tracking-FFBE00?style=for-the-badge&logo=weightsandbiases&logoColor=111827)
+![Optuna](https://img.shields.io/badge/Optuna-Hyperparameter%20Search-6A5ACD?style=for-the-badge)
+![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-13ADC7?style=for-the-badge)
+![Feast](https://img.shields.io/badge/Feast-Feature%20Store-2563EB?style=for-the-badge)
+![Prefect](https://img.shields.io/badge/Prefect-Orchestration-111827?style=for-the-badge&logo=prefect&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 
 ## Table Of Contents
 
@@ -87,6 +95,9 @@
 - [35. Rollback And Recovery Path](#35-rollback-and-recovery-path)
 - [36. Non-Functional Requirements Matrix](#36-non-functional-requirements-matrix)
 - [37. Architecture Governance](#37-architecture-governance)
+- [38. Extended MLOps Control Plane](#38-extended-mlops-control-plane)
+- [39. Capability Detection Model](#39-capability-detection-model)
+- [40. Monitoring And Retraining Topology](#40-monitoring-and-retraining-topology)
 
 ## Document Metadata
 
@@ -135,12 +146,15 @@ The architecture is designed to be portfolio-grade while staying executable in a
 - FastAPI and Flask runtime services.
 - Next.js frontend for interactive analytics.
 - Training-time MLOps artifacts and registry.
+- Optional experiment tracking (`MLflow`, `W&B`) and HPO (`Optuna`) integration.
+- Feature-store and data-versioning scaffolding (`Feast`, `DVC`).
+- Scheduled retraining orchestration (`Prefect`) and deployable monitoring stack (`Prometheus`, `Grafana`).
 
 ### Out Of Scope
 
 - multi-tenant identity and RBAC.
 - distributed retraining orchestration.
-- online feature store.
+- managed online feature store serving tier.
 - managed model serving platform.
 
 ## 3. Architectural Goals
@@ -406,6 +420,7 @@ Implementation: `src/youtube_success_ml/models/clustering.py`
 - `GET /mlops/manifest`
 - `GET /mlops/registry`
 - `POST /mlops/drift-check`
+- `GET /mlops/capabilities`
 - `GET /metrics`
 
 ### Flask Endpoints
@@ -456,6 +471,7 @@ flowchart LR
     D[Dataset SHA256] --> M[training_manifest.json]
     C[Training Config Snapshot] --> M
     R[Model and Report Artifact Hashes] --> M
+    FS[feature_store_snapshot.csv] --> M
     M --> G[model_registry.json]
     G --> A[active_run_id]
 ```
@@ -464,14 +480,32 @@ flowchart LR
 
 - metrics report
 - data quality report
+- feature snapshot report
 - training manifest
 - model registry with active run pointer
+
+### Extended MLOps Modules
+
+```mermaid
+flowchart TB
+    TRAIN[run_training] --> EXP[Experiment Tracker]
+    TRAIN --> HPO[Optuna HPO]
+    TRAIN --> QUAL[Quality + Drift Baseline]
+    TRAIN --> SNAP[Feature Snapshot Export]
+    QUAL --> REG[Manifest + Registry]
+    SNAP --> FEAST[Feast Repo Assets]
+    SNAP --> DVC[DVC Pipeline Outputs]
+    EXP --> LOGS[MLflow / W&B]
+```
+
+Extension activation is opt-in so the default training/testing path remains stable without additional services.
 
 ### Operational Benefits
 
 - reproducible run tracing
 - easier rollback decisions
 - audit-friendly history of model state transitions
+- controlled optionality for advanced MLOps tooling
 
 ## 14. Observability
 
@@ -481,12 +515,16 @@ flowchart LR
 - readiness endpoint
 - path-level request counters and cumulative latency (`/metrics`)
 - process-time response header (`X-Process-Time-Seconds`)
+- in-repo Prometheus configuration (`infra/monitoring/prometheus`)
+- in-repo Grafana provisioning and dashboards (`infra/monitoring/grafana`)
+- Kubernetes monitoring overlay (`infra/k8s/monitoring`)
 
-### Recommended Next (Not Yet Implemented)
+### Runtime Capability Surface
 
-- distributed tracing exporter
-- structured logging sink
-- model performance telemetry from live prediction outcomes
+- `GET /mlops/capabilities` provides runtime posture:
+  - installed optional packages (`mlflow`, `wandb`, `optuna`, `prefect`)
+  - presence of feature-store/data-versioning files
+  - presence of monitoring assets
 
 ## 15. Reliability And Failure Modes
 
@@ -575,12 +613,18 @@ Pipeline responsibilities:
 - GitHub Actions:
   - Python dependency install, training pipeline execution, and `pytest`
   - frontend install, lint, and production build
+  - intentionally uses baseline training mode (no required MLflow/Optuna/Prefect services)
 - Jenkins:
   - repeat quality gates (train/test/lint/build)
   - container build/push to cloud registry
   - overlay image updates for selected rollout strategy
   - terraform plan/apply orchestration per cloud provider
   - Argo CD sync and optional blue/green promotion gate
+
+Extension strategy:
+
+- Advanced MLOps modules are additive and activated by explicit operator intent.
+- This prevents CI fragility while preserving production extensibility.
 
 This split keeps PR quality checks fast while preserving production-grade release controls.
 
@@ -616,9 +660,10 @@ This split keeps PR quality checks fast while preserving production-grade releas
 ## 21. Suggested Enterprise Evolution Path
 
 - replace local registry files with managed model registry.
-- add feature store for offline/online parity.
+- evolve Feast scaffolding into managed offline/online feature serving.
+- harden Prefect retraining schedules with approval workflows and policy checks.
 - add canary release process for promoted models.
-- add data drift checks and scheduled retraining pipelines.
+- extend drift checks from request-level to population-level production windows.
 - add SLO dashboards and alerting tied to `/metrics` and model KPI regressions.
 
 ## 22. Source File Index
@@ -633,6 +678,9 @@ Core files:
 - `src/youtube_success_ml/api/flask_app.py`
 - `src/youtube_success_ml/mlops/quality.py`
 - `src/youtube_success_ml/mlops/registry.py`
+- `src/youtube_success_ml/mlops/experiments.py`
+- `src/youtube_success_ml/mlops/hpo.py`
+- `src/youtube_success_ml/mlops/feature_store.py`
 - `frontend/app/page.tsx`
 - `frontend/app/visualizations/charts/page.tsx`
 - `frontend/app/intelligence/lab/page.tsx`
@@ -643,6 +691,16 @@ Core files:
 - `scripts/format_all.sh`
 - `scripts/format_prettier.sh`
 - `scripts/format_python.sh`
+- `scripts/mlops/export_feature_store_snapshot.py`
+- `scripts/mlops/run_prefect_retraining.sh`
+- `orchestration/prefect/retraining_flow.py`
+- `dvc.yaml`
+- `params.yaml`
+- `feature_store/feast/feature_store.yaml`
+- `feature_store/feast/feature_repo.py`
+- `infra/monitoring/prometheus/prometheus.yml`
+- `infra/monitoring/grafana/dashboards/yts-api-observability.json`
+- `infra/k8s/monitoring/kustomization.yaml`
 
 ## 23. Operational Checklist
 
@@ -679,6 +737,7 @@ flowchart LR
     Client --> MF["/mlops/manifest"]
     Client --> MR["/mlops/registry"]
     Client --> DC["/mlops/drift-check"]
+    Client --> CAP["/mlops/capabilities"]
     Client --> MT["/metrics"]
 
     P --> SVC[IntelligenceService]
@@ -1054,4 +1113,101 @@ flowchart TD
     Validation --> Docs[Documentation Synchronization]
     Docs --> Review[Architecture Review]
     Review --> Release[Release Approval]
+```
+
+## 38. Extended MLOps Control Plane
+
+The platform now includes a layered MLOps control plane:
+
+- baseline lineage and drift controls (always-on)
+- optional experiment and HPO controls (MLflow/W&B/Optuna)
+- optional data lifecycle controls (DVC/Feast)
+- optional orchestration and observability controls (Prefect/Prometheus/Grafana)
+
+```mermaid
+flowchart LR
+    subgraph Baseline
+      T[Training]
+      R[Manifest + Registry]
+      D[Drift Check]
+    end
+
+    subgraph Optional
+      E[MLflow/W&B]
+      H[Optuna]
+      F[DVC/Feast]
+      O[Prefect]
+      M[Prometheus/Grafana]
+    end
+
+    T --> R
+    T --> D
+    T --> E
+    T --> H
+    T --> F
+    O --> T
+    M --> D
+    M --> R
+```
+
+## 39. Capability Detection Model
+
+Capability detection is exposed via `/mlops/capabilities` to reduce ambiguity between environments.
+
+Use cases:
+
+- deployment preflight in staging/prod
+- health dashboard enrichment
+- CI smoke checks for optional module readiness
+
+```mermaid
+sequenceDiagram
+    participant Ops as Operator
+    participant API as API Service
+    participant FS as Filesystem
+    participant PKG as Python Runtime
+
+    Ops->>API: GET /mlops/capabilities
+    API->>PKG: check optional imports
+    API->>FS: check dvc/feast/prefect/monitoring files
+    PKG-->>API: installed/not-installed map
+    FS-->>API: present/missing map
+    API-->>Ops: consolidated capability response
+```
+
+## 40. Monitoring And Retraining Topology
+
+Monitoring and retraining are decoupled from request serving but integrated through common artifact and readiness contracts.
+
+```mermaid
+flowchart TB
+    subgraph Runtime
+      API[FastAPI/Flask]
+      MET["/metrics"]
+      READY["/ready"]
+    end
+
+    subgraph Observability
+      PROM[Prometheus]
+      GRAF[Grafana]
+    end
+
+    subgraph Orchestration
+      PREF[Prefect Flow]
+      TRAIN[run_training]
+    end
+
+    subgraph Artifacts
+      REG[Manifest + Registry]
+      REP[Reports + Feature Snapshot]
+    end
+
+    API --> MET
+    API --> READY
+    MET --> PROM
+    PROM --> GRAF
+    PREF --> TRAIN
+    TRAIN --> REG
+    TRAIN --> REP
+    READY --> PREF
 ```

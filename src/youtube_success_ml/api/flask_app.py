@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
+
 import numpy as np
 from flask import Flask, jsonify, request
 
@@ -231,6 +234,38 @@ def drift_check():
         return jsonify({"error": str(exc)}), 503
     except Exception as exc:  # noqa: BLE001
         return jsonify({"error": f"Invalid payload: {exc}"}), 400
+
+
+@app.get("/mlops/capabilities")
+def mlops_capabilities():
+    def _installed(module: str) -> bool:
+        return importlib.util.find_spec(module) is not None
+
+    return jsonify(
+        {
+            "experiment_tracking": {
+                "mlflow_installed": _installed("mlflow"),
+                "wandb_installed": _installed("wandb"),
+            },
+            "hpo": {"optuna_installed": _installed("optuna")},
+            "feature_store": {
+                "dvc_project_present": Path("dvc.yaml").exists(),
+                "feast_repo_present": Path("feature_store/feast/feature_store.yaml").exists(),
+            },
+            "orchestration": {
+                "prefect_installed": _installed("prefect"),
+                "prefect_flow_present": Path("orchestration/prefect/retraining_flow.py").exists(),
+            },
+            "monitoring": {
+                "prometheus_config_present": Path(
+                    "infra/monitoring/prometheus/prometheus.yml"
+                ).exists(),
+                "grafana_dashboards_present": Path(
+                    "infra/monitoring/grafana/dashboards/yts-api-observability.json"
+                ).exists(),
+            },
+        }
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "youtube-success-ml"
+    orgId: 1
+    folder: "YouTube Success ML"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

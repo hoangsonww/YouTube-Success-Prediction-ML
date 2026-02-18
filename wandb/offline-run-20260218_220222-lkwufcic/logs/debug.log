@@ -1,0 +1,24 @@
+2026-02-18 22:02:22,509 INFO    MainThread:1101 [wandb_setup.py:_flush():81] Current SDK version is 0.25.0
+2026-02-18 22:02:22,509 INFO    MainThread:1101 [wandb_setup.py:_flush():81] Configure stats pid to 1101
+2026-02-18 22:02:22,510 INFO    MainThread:1101 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-02-18 22:02:22,510 INFO    MainThread:1101 [wandb_init.py:setup_run_log_directory():717] Logging user logs to /Users/davidnguyen/PycharmProjects/YouTube-Success-ML/wandb/offline-run-20260218_220222-lkwufcic/logs/debug.log
+2026-02-18 22:02:22,510 INFO    MainThread:1101 [wandb_init.py:setup_run_log_directory():718] Logging internal logs to /Users/davidnguyen/PycharmProjects/YouTube-Success-ML/wandb/offline-run-20260218_220222-lkwufcic/logs/debug-internal.log
+2026-02-18 22:02:22,510 INFO    MainThread:1101 [wandb_init.py:init():844] calling init triggers
+2026-02-18 22:02:22,510 INFO    MainThread:1101 [wandb_init.py:init():849] wandb.init called with sweep_config: {}
+config: {'run_id': '20260218T150221Z-6f368ac9', '_wandb': {}}
+2026-02-18 22:02:22,510 INFO    MainThread:1101 [wandb_init.py:init():892] starting backend
+2026-02-18 22:02:24,905 INFO    MainThread:1101 [wandb_init.py:init():895] sending inform_init request
+2026-02-18 22:02:24,919 INFO    MainThread:1101 [wandb_init.py:init():903] backend started and connected
+2026-02-18 22:02:24,921 INFO    MainThread:1101 [wandb_init.py:init():973] updated telemetry
+2026-02-18 22:02:24,936 INFO    MainThread:1101 [wandb_init.py:init():997] communicating run to backend with 90.0 second timeout
+2026-02-18 22:02:25,863 INFO    MainThread:1101 [wandb_init.py:init():1042] starting run threads in backend
+2026-02-18 22:02:26,000 INFO    MainThread:1101 [wandb_run.py:_console_start():2524] atexit reg
+2026-02-18 22:02:26,000 INFO    MainThread:1101 [wandb_run.py:_redirect():2373] redirect: wrap_raw
+2026-02-18 22:02:26,000 INFO    MainThread:1101 [wandb_run.py:_redirect():2442] Wrapping output streams.
+2026-02-18 22:02:26,000 INFO    MainThread:1101 [wandb_run.py:_redirect():2465] Redirects installed.
+2026-02-18 22:02:26,002 INFO    MainThread:1101 [wandb_init.py:init():1082] run started, returning control to user process
+2026-02-18 22:02:31,453 INFO    MainThread:1101 [wandb_run.py:_config_callback():1403] config_cb None None {'random_state': 42, 'test_size': 0.2, 'n_estimators': 380, 'min_samples_leaf': 5, 'n_clusters': 4, 'dbscan_eps': 0.95, 'dbscan_min_samples': 12, 'run_maps': True, 'optuna_trials': 25}
+2026-02-18 22:02:33,503 INFO    MainThread:1101 [wandb_run.py:_finish():2291] finishing run youtube-success-ml/lkwufcic
+2026-02-18 22:02:33,503 INFO    MainThread:1101 [wandb_run.py:_atexit_cleanup():2490] got exitcode: 0
+2026-02-18 22:02:33,503 INFO    MainThread:1101 [wandb_run.py:_restore():2472] restore
+2026-02-18 22:02:33,503 INFO    MainThread:1101 [wandb_run.py:_restore():2478] restore done

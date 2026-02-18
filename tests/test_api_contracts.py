@@ -100,6 +100,7 @@ def test_fastapi_ready_and_mlops_contract():
     ready = client.get("/ready")
     manifest = client.get("/mlops/manifest")
     registry = client.get("/mlops/registry")
+    capabilities = client.get("/mlops/capabilities")
     metrics = client.get("/metrics")
 
     assert ready.status_code == 200
@@ -108,6 +109,8 @@ def test_fastapi_ready_and_mlops_contract():
     assert "run_id" in manifest.json()
     assert registry.status_code == 200
     assert "active_run_id" in registry.json()
+    assert capabilities.status_code == 200
+    assert "experiment_tracking" in capabilities.json()
     assert metrics.status_code == 200
     assert "http_requests_total" in metrics.text
 

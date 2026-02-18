@@ -3,7 +3,7 @@ VENV ?= .venv
 PIP := $(VENV)/bin/pip
 PY := $(VENV)/bin/python
 
-.PHONY: venv install install-dev train test lint serve-fastapi serve-flask smoke-api frontend-build frontend-dev format-all format-python format-prettier export-processed-data eda k8s-render-rolling k8s-render-canary k8s-render-bluegreen terraform-plan-aws terraform-plan-gcp terraform-plan-azure terraform-plan-oci
+.PHONY: venv install install-dev train train-optuna test lint serve-fastapi serve-flask smoke-api frontend-build frontend-dev format-all format-python format-prettier export-processed-data export-feature-snapshot eda mlops-monitoring-up mlops-monitoring-down prefect-retrain k8s-render-rolling k8s-render-canary k8s-render-bluegreen terraform-plan-aws terraform-plan-gcp terraform-plan-azure terraform-plan-oci
 
 venv:
 	$(PYTHON) -m venv $(VENV) --system-site-packages
@@ -17,6 +17,9 @@ install-dev: venv
 
 train:
 	PYTHONPATH=src $(PY) -m youtube_success_ml.train --run-all
+
+train-optuna:
+	PYTHONPATH=src $(PY) -m youtube_success_ml.train --run-all --optuna-trials 25
 
 test:
 	PYTHONPATH=src $(PY) -m pytest -q
@@ -48,8 +51,20 @@ format-prettier:
 export-processed-data:
 	PYTHONPATH=src $(PY) analysis/scripts/export_processed_dataset.py --input "data/Global YouTube Statistics.csv" --output "data/global_youtube_statistics_processed.csv"
 
+export-feature-snapshot:
+	PYTHONPATH=src $(PY) scripts/mlops/export_feature_store_snapshot.py --input "data/Global YouTube Statistics.csv" --output "artifacts/reports/feature_store_snapshot.csv"
+
 eda:
 	PYTHONPATH=src $(PY) analysis/scripts/run_eda.py --input "data/Global YouTube Statistics.csv" --output-dir artifacts/reports/eda --top-n-countries 20
+
+mlops-monitoring-up:
+	docker compose -f docker-compose.monitoring.yml up -d
+
+mlops-monitoring-down:
+	docker compose -f docker-compose.monitoring.yml down
+
+prefect-retrain:
+	bash scripts/mlops/run_prefect_retraining.sh
 
 k8s-render-rolling:
 	kubectl kustomize infra/k8s/overlays/rolling

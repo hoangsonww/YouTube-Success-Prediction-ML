@@ -1,0 +1,7 @@
+.venv
+frontend/node_modules
+frontend/.next
+__pycache__
+.pytest_cache
+.idea
+artifacts/maps

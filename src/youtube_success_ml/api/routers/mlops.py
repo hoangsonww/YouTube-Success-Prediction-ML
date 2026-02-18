@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
 
@@ -9,7 +12,11 @@ from youtube_success_ml.api.dependencies import (
     request_latency_sum_by_path,
 )
 from youtube_success_ml.mlops.registry import load_manifest, load_registry
-from youtube_success_ml.schemas import DriftCheckRequest, DriftCheckResponse
+from youtube_success_ml.schemas import (
+    DriftCheckRequest,
+    DriftCheckResponse,
+    MlopsCapabilitiesResponse,
+)
 
 router = APIRouter(tags=["mlops"])
 
@@ -42,6 +49,38 @@ def drift_check(payload: DriftCheckRequest) -> DriftCheckResponse:
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return DriftCheckResponse(**result)
+
+
+@router.get("/mlops/capabilities", response_model=MlopsCapabilitiesResponse)
+def mlops_capabilities() -> MlopsCapabilitiesResponse:
+    def _installed(module: str) -> bool:
+        return importlib.util.find_spec(module) is not None
+
+    return MlopsCapabilitiesResponse(
+        experiment_tracking={
+            "mlflow_installed": _installed("mlflow"),
+            "wandb_installed": _installed("wandb"),
+        },
+        hpo={
+            "optuna_installed": _installed("optuna"),
+        },
+        feature_store={
+            "dvc_project_present": Path("dvc.yaml").exists(),
+            "feast_repo_present": Path("feature_store/feast/feature_store.yaml").exists(),
+        },
+        orchestration={
+            "prefect_installed": _installed("prefect"),
+            "prefect_flow_present": Path("orchestration/prefect/retraining_flow.py").exists(),
+        },
+        monitoring={
+            "prometheus_config_present": Path(
+                "infra/monitoring/prometheus/prometheus.yml"
+            ).exists(),
+            "grafana_dashboards_present": Path(
+                "infra/monitoring/grafana/dashboards/yts-api-observability.json"
+            ).exists(),
+        },
+    )
 
 
 @router.get("/metrics", response_class=PlainTextResponse)
