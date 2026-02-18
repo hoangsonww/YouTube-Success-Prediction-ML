@@ -4,13 +4,12 @@ import argparse
 import json
 
 from youtube_success_ml.config import (
-    DEFAULT_DATA_PATH,
     MAP_DIR,
     MODEL_DIR,
     REPORT_DIR,
     TrainingConfig,
 )
-from youtube_success_ml.data.loader import load_dataset, load_raw_dataset
+from youtube_success_ml.data.loader import load_dataset, load_raw_dataset, resolve_data_path
 from youtube_success_ml.logging_utils import configure_logging
 from youtube_success_ml.mlops.drift import build_training_baseline, save_training_baseline
 from youtube_success_ml.mlops.quality import build_data_quality_report, save_data_quality_report
@@ -27,8 +26,9 @@ from youtube_success_ml.visualization.maps import export_map_assets
 
 def run_training(run_maps: bool = True) -> dict:
     cfg = TrainingConfig.from_env()
-    raw_df = load_raw_dataset()
-    df = load_dataset()
+    data_path = resolve_data_path()
+    raw_df = load_raw_dataset(path=data_path)
+    df = load_dataset(path=data_path)
 
     supervised = train_supervised_bundle(df, config=cfg, model_dir=MODEL_DIR)
     clustering, _ = train_clustering_bundle(df, config=cfg, model_dir=MODEL_DIR)
@@ -54,7 +54,7 @@ def run_training(run_maps: bool = True) -> dict:
         run_id=run_id,
         config=cfg,
         metrics=metrics,
-        data_path=DEFAULT_DATA_PATH,
+        data_path=data_path,
         model_dir=MODEL_DIR,
         report_dir=REPORT_DIR,
     )

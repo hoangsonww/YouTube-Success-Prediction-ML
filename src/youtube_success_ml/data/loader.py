@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
-from youtube_success_ml.config import DEFAULT_DATA_PATH
+from youtube_success_ml.config import DATASET_FILENAME, DEFAULT_DATA_PATH, PROJECT_ROOT
 
 
 def _normalize_column_name(col: str) -> str:
@@ -16,9 +17,51 @@ def _normalize_column_name(col: str) -> str:
     return clean.strip("_").lower()
 
 
+def _dedupe_paths(paths: Iterable[Path]) -> list[Path]:
+    deduped: list[Path] = []
+    seen: set[Path] = set()
+    for path in paths:
+        candidate = path.expanduser()
+        if candidate not in seen:
+            seen.add(candidate)
+            deduped.append(candidate)
+    return deduped
+
+
+def resolve_data_path(path: Path | str | None = None) -> Path:
+    """Resolve dataset path across local/dev/CI package-install contexts."""
+    if path is not None:
+        explicit = Path(path).expanduser()
+        if explicit.exists():
+            return explicit
+        raise FileNotFoundError(f"Dataset not found at explicit path: {explicit}")
+
+    cwd = Path.cwd().resolve()
+    candidates = [
+        cwd / "data" / DATASET_FILENAME,
+        cwd / DATASET_FILENAME,
+        DEFAULT_DATA_PATH,
+        PROJECT_ROOT / "data" / DATASET_FILENAME,
+    ]
+    candidates.extend(parent / "data" / DATASET_FILENAME for parent in cwd.parents)
+    module_root = Path(__file__).resolve().parents[1]
+    candidates.append(module_root / "data" / DATASET_FILENAME)
+
+    deduped = _dedupe_paths(candidates)
+    for candidate in deduped:
+        if candidate.exists():
+            return candidate
+
+    searched = "\n".join(f"- {candidate}" for candidate in deduped[:8])
+    raise FileNotFoundError(
+        "Could not locate dataset. Set YTS_DATA_PATH or place the CSV in one of these paths:\n"
+        f"{searched}"
+    )
+
+
 def load_raw_dataset(path: Path | str | None = None) -> pd.DataFrame:
     """Load source dataset and normalize schema without feature engineering."""
-    file_path = Path(path) if path is not None else DEFAULT_DATA_PATH
+    file_path = resolve_data_path(path)
     df = pd.read_csv(file_path, encoding="latin-1")
     df.columns = [_normalize_column_name(c) for c in df.columns]
 
