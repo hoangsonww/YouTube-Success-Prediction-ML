@@ -1,5 +1,22 @@
 # YouTube Success ML Platform
 
+<p align="center">
+  <img src="images/images.png" alt="Logo" width="60%">
+</p>
+
+This repository contains a production-oriented machine learning platform for YouTube channel success prediction and intelligence. The system combines:
+
+1. Supervised prediction of channel outcomes.
+2. Unsupervised channel archetype discovery.
+3. Global analytics and map-ready country/category intelligence.
+4. Production API and frontend delivery with MLOps artifacts.
+5. Multi-cloud deployment and GitOps strategy.
+6. Comprehensive documentation and operational runbooks.
+7. Quality gates, testing, and formatting for maintainability.
+8. Detailed design and architecture documentation for engineering alignment.
+
+This `README.md` is only the operational entrypoint. For detailed design and subsystem contracts, use the linked documentation map below.
+
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-Data%20Processing-150458?style=for-the-badge&logo=pandas&logoColor=white)
 ![NumPy](https://img.shields.io/badge/NumPy-Numerical%20Computing-013243?style=for-the-badge&logo=numpy&logoColor=white)
@@ -40,19 +57,6 @@
 ![GNU Make](https://img.shields.io/badge/GNU%20Make-Automation-6C6C6C?style=for-the-badge&logo=gnu&logoColor=white)
 ![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Diagrams-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
-
-This repository contains a production-oriented machine learning platform for YouTube channel success prediction and intelligence. The system combines:
-
-1. Supervised prediction of channel outcomes.
-2. Unsupervised channel archetype discovery.
-3. Global analytics and map-ready country/category intelligence.
-4. Production API and frontend delivery with MLOps artifacts.
-5. Multi-cloud deployment and GitOps strategy.
-6. Comprehensive documentation and operational runbooks.
-7. Quality gates, testing, and formatting for maintainability.
-8. Detailed design and architecture documentation for engineering alignment.
-
-This `README.md` is only the operational entrypoint. For detailed design and subsystem contracts, use the linked documentation map below.
 
 ## Table Of Contents
 
