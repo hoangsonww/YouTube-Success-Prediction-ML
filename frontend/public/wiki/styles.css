@@ -283,6 +283,18 @@ a {
   border-color: rgba(166, 186, 233, 0.42);
 }
 
+.hero-cta .btn-demo {
+  background: linear-gradient(125deg, #1f7aff 0%, #6f5bff 52%, #7b43ff 100%);
+  border-color: rgba(145, 167, 255, 0.86);
+  color: #f7f8ff;
+  box-shadow: 0 10px 24px rgba(54, 78, 196, 0.42);
+}
+
+.hero-cta .btn-demo:hover {
+  border-color: rgba(182, 200, 255, 0.96);
+  box-shadow: 0 14px 30px rgba(70, 89, 210, 0.5);
+}
+
 .hero.reveal.in-view .kicker,
 .hero.reveal.in-view h1,
 .hero.reveal.in-view .lead,
