@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const base = "https://youtube-success-ml.example.com";
+const base = "https://hoangsonww.github.io/YouTube-Success-Prediction-ML";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://youtube-success-ml.example.com/sitemap.xml",
+    sitemap: "https://hoangsonww.github.io/YouTube-Success-Prediction-ML/sitemap.xml",
   };
 }
