@@ -303,6 +303,7 @@ Primary source dataset:
 
 - path resolution: `resolve_data_path()` in `src/youtube_success_ml/data/loader.py`
 - default source file: `data/Global YouTube Statistics.csv`
+- canonical source: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023?resource=download)
 - optional override: `YTS_DATA_PATH`
 - encoding: `latin-1`
 - row count: `995`
