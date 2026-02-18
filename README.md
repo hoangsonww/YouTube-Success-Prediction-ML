@@ -15,7 +15,7 @@ This repository contains a production-oriented machine learning platform for You
 7. Quality gates, testing, and formatting for maintainability.
 8. Detailed design and architecture documentation for engineering alignment.
 
-This `README.md` is only the operational entrypoint. For detailed design and subsystem contracts, use the linked documentation map below.
+This `README.md` is only the operational entrypoint. For detailed design and subsystem contracts, use the linked [documentation map](#documentation-map) below.
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-Data%20Processing-150458?style=for-the-badge&logo=pandas&logoColor=white)
