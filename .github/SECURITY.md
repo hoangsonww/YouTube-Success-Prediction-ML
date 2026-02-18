@@ -70,7 +70,7 @@ We welcome and appreciate good-faith security research. As long as you:
 - Do not degrade the service for other users.
 - Promptly report any issues you find to us.
 
-and you will not face legal action from the YouTube Success Prediction ML team.
+and you will not face legal action from Son Nguyen.
 
 ---
 
