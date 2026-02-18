@@ -4,12 +4,50 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_DATA_PATH = PROJECT_ROOT / "data" / "Global YouTube Statistics.csv"
-ARTIFACT_DIR = PROJECT_ROOT / "artifacts"
-MODEL_DIR = Path(os.getenv("YTS_MODEL_DIR", ARTIFACT_DIR / "models"))
-REPORT_DIR = ARTIFACT_DIR / "reports"
-MAP_DIR = ARTIFACT_DIR / "maps"
+DATASET_FILENAME = "Global YouTube Statistics.csv"
+
+
+def _candidate_roots() -> list[Path]:
+    cwd = Path.cwd().resolve()
+    module_root = Path(__file__).resolve().parents[2]
+    candidates = [cwd, *cwd.parents, module_root, *module_root.parents]
+
+    # Preserve order while deduplicating.
+    deduped: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate not in seen:
+            seen.add(candidate)
+            deduped.append(candidate)
+    return deduped
+
+
+def _resolve_project_root() -> Path:
+    env_root = os.getenv("YTS_PROJECT_ROOT")
+    if env_root:
+        return Path(env_root).expanduser().resolve()
+
+    candidates = _candidate_roots()
+
+    for root in candidates:
+        if (root / "pyproject.toml").exists() and (root / "data").exists():
+            return root
+
+    for root in candidates:
+        if (root / "data" / DATASET_FILENAME).exists():
+            return root
+
+    return Path.cwd().resolve()
+
+
+PROJECT_ROOT = _resolve_project_root()
+DEFAULT_DATA_PATH = Path(
+    os.getenv("YTS_DATA_PATH", str(PROJECT_ROOT / "data" / DATASET_FILENAME))
+).expanduser()
+ARTIFACT_DIR = Path(os.getenv("YTS_ARTIFACT_DIR", str(PROJECT_ROOT / "artifacts"))).expanduser()
+MODEL_DIR = Path(os.getenv("YTS_MODEL_DIR", str(ARTIFACT_DIR / "models"))).expanduser()
+REPORT_DIR = Path(os.getenv("YTS_REPORT_DIR", str(ARTIFACT_DIR / "reports"))).expanduser()
+MAP_DIR = Path(os.getenv("YTS_MAP_DIR", str(ARTIFACT_DIR / "maps"))).expanduser()
 
 
 @dataclass(frozen=True)

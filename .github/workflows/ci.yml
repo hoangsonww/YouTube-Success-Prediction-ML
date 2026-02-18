@@ -34,6 +34,10 @@ jobs:
           pip install --no-build-isolation ".[dev]"
 
       - name: Train models and run tests
+        env:
+          YTS_PROJECT_ROOT: ${{ github.workspace }}
+          YTS_DATA_PATH: ${{ github.workspace }}/data/Global YouTube Statistics.csv
+          YTS_ARTIFACT_DIR: ${{ github.workspace }}/artifacts
         run: |
           python -m youtube_success_ml.train --run-all
           pytest -q
