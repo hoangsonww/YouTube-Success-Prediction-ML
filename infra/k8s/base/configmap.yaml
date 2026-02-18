@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yts-config
+  labels:
+    app.kubernetes.io/name: youtube-success-ml
+data:
+  APP_ENV: "production"
+  YTS_MODEL_DIR: "/app/artifacts/models"
+  YTS_REPORTS_DIR: "/app/artifacts/reports"
+  NEXT_PUBLIC_API_BASE_URL: "https://api.youtube-success.example.com"

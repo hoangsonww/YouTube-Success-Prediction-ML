@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: yts-prod
+
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - secret.example.yaml
+  - pvc-artifacts.yaml
+  - deployment-api.yaml
+  - deployment-frontend.yaml
+  - service-api.yaml
+  - service-frontend.yaml
+  - ingress.yaml
+  - hpa-api.yaml
+  - hpa-frontend.yaml
+  - pdb-api.yaml
+  - pdb-frontend.yaml
+  - networkpolicy.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: youtube-success-ml
+      app.kubernetes.io/managed-by: argo-cd

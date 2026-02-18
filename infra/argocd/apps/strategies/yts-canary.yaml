@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: yts-canary
+  namespace: argocd
+  labels:
+    yts.strategy: canary
+spec:
+  project: youtube-success-ml
+  source:
+    repoURL: https://github.com/davidnguyen/YouTube-Success-ML.git
+    targetRevision: main
+    path: infra/k8s/overlays/canary
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: yts-prod
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

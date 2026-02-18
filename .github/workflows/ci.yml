@@ -1,0 +1,204 @@
+name: 🚀 CI Pipeline - YouTube Success ML
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  backend_ml:
+    name: "🧪 Backend + ML Train/Test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install --no-build-isolation ".[dev]"
+
+      - name: Train models and run tests
+        run: |
+          python -m youtube_success_ml.train --run-all
+          pytest -q
+
+      - name: Upload ML artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ml-training-artifacts
+          path: |
+            artifacts/**
+          if-no-files-found: error
+          retention-days: 14
+
+  frontend_build:
+    name: "🎨 Frontend Lint + Build"
+    runs-on: ubuntu-latest
+    needs: [backend_ml]
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload frontend build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-artifacts
+          path: |
+            frontend/.next/**
+            frontend/public/**
+            frontend/package.json
+            frontend/package-lock.json
+          if-no-files-found: error
+          retention-days: 14
+
+  pipeline_report:
+    name: "📊 Pipeline Status Report"
+    runs-on: ubuntu-latest
+    needs: [backend_ml, frontend_build]
+    if: always()
+    steps:
+      - name: Build workflow summary
+        env:
+          BACKEND_STATUS: ${{ needs.backend_ml.result }}
+          FRONTEND_STATUS: ${{ needs.frontend_build.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          status_emoji() {
+            case "$1" in
+              success) echo "✅ success" ;;
+              failure) echo "❌ failure" ;;
+              cancelled) echo "🛑 cancelled" ;;
+              skipped) echo "⏭️ skipped" ;;
+              *) echo "❔ $1" ;;
+            esac
+          }
+
+          BACKEND_DISPLAY="$(status_emoji "$BACKEND_STATUS")"
+          FRONTEND_DISPLAY="$(status_emoji "$FRONTEND_STATUS")"
+
+          {
+            echo "## 📊 CI Pipeline Report"
+            echo ""
+            echo "| Stage | Status |"
+            echo "| --- | --- |"
+            echo "| 🧪 Backend + ML Train/Test | ${BACKEND_DISPLAY} |"
+            echo "| 🎨 Frontend Lint + Build | ${FRONTEND_DISPLAY} |"
+            echo ""
+            echo "### 📦 Artifacts"
+            echo "- \`ml-training-artifacts\` (models, reports, registry, maps)"
+            echo "- \`frontend-build-artifacts\` (Next.js build output)"
+            echo ""
+            echo "Run details: ${RUN_URL}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Comment PR with pipeline status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          BACKEND_STATUS: ${{ needs.backend_ml.result }}
+          FRONTEND_STATUS: ${{ needs.frontend_build.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const marker = "<!-- ci-pipeline-report -->";
+            const statusEmoji = (status) => {
+              if (status === "success") return "✅ success";
+              if (status === "failure") return "❌ failure";
+              if (status === "cancelled") return "🛑 cancelled";
+              if (status === "skipped") return "⏭️ skipped";
+              return `❔ ${status}`;
+            };
+
+            const backend = process.env.BACKEND_STATUS;
+            const frontend = process.env.FRONTEND_STATUS;
+            const runUrl = process.env.RUN_URL;
+
+            const body = [
+              marker,
+              "## 📊 CI Pipeline Report",
+              "",
+              "| Stage | Status |",
+              "| --- | --- |",
+              `| 🧪 Backend + ML Train/Test | ${statusEmoji(backend)} |`,
+              `| 🎨 Frontend Lint + Build | ${statusEmoji(frontend)} |`,
+              "",
+              "### 📦 Artifacts",
+              "- `ml-training-artifacts`",
+              "- `frontend-build-artifacts`",
+              "",
+              `[Open workflow run](${runUrl})`,
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existing = comments.find(
+              (c) => c.user?.type === "Bot" && c.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Enforce overall pipeline success
+        if: ${{ needs.backend_ml.result != 'success' || needs.frontend_build.result != 'success' }}
+        run: |
+          echo "One or more pipeline stages failed."
+          exit 1

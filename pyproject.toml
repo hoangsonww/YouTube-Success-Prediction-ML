@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "youtube-success-ml"
+version = "0.1.0"
+description = "Production-grade ML system for YouTube success prediction, clustering, and global analytics"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.2.0",
+  "numpy>=1.26.0",
+  "scikit-learn>=1.5.0",
+  "scipy>=1.13.0",
+  "joblib>=1.4.0",
+  "pydantic>=2.8.0",
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "flask>=3.0.0",
+  "plotly>=5.24.0",
+  "folium>=0.17.0",
+  "python-dotenv>=1.0.1"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "httpx>=0.28.0",
+  "ruff>=0.6.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [
+  ".git",
+  ".venv",
+  ".pytest_cache",
+  "frontend/node_modules",
+  "frontend/.next",
+  "artifacts",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

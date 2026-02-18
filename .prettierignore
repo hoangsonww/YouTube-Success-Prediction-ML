@@ -1,0 +1,17 @@
+**/*.md
+
+.git
+.github
+.idea
+.venv
+.pytest_cache
+
+artifacts
+frontend/.next
+frontend/node_modules
+
+**/.terraform
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfplan

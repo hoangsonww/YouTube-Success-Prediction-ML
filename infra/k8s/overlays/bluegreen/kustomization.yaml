@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - rollout-api.yaml
+  - rollout-frontend.yaml
+  - service-api-preview.yaml
+  - service-frontend-preview.yaml
+
+images:
+  - name: ghcr.io/davidnguyen/yts-api
+    newName: ghcr.io/davidnguyen/yts-api
+    newTag: bluegreen
+  - name: ghcr.io/davidnguyen/yts-frontend
+    newName: ghcr.io/davidnguyen/yts-frontend
+    newTag: bluegreen
+
+patches:
+  - path: delete-deployment-api.yaml
+  - path: delete-deployment-frontend.yaml
+  - path: patch-hpa-api.yaml
+  - path: patch-hpa-frontend.yaml
+  - path: patch-configmap.yaml

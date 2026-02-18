@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Success ML | Platform Wiki</title>
+    <meta
+      name="description"
+      content="Production-grade YouTube Success ML platform wiki: prediction, clustering, visualization, MLOps, and multi-cloud deployment architecture."
+    />
+    <meta name="theme-color" content="#0d1321" />
+    <link rel="icon" href="frontend/public/favicon.ico" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="bg-grid"></div>
+
+    <header class="topbar">
+      <nav class="navbar container" aria-label="Main">
+        <a href="#home" class="brand">
+          <span class="brand-dot"></span>
+          <span>YouTube Success ML</span>
+        </a>
+
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">Menu</button>
+
+        <div id="nav-links" class="nav-links">
+          <a href="#capabilities">Capabilities</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#mlops">MLOps</a>
+          <a href="#deployment">Deployment</a>
+          <a href="#command-center">Commands</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#docs">Docs</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </nav>
+      <div class="scroll-progress" id="scroll-progress"></div>
+    </header>
+
+    <main>
+      <section id="home" class="hero container reveal" data-search="overview platform wiki landing">
+        <p class="kicker">Portfolio-grade Machine Learning System</p>
+        <h1>Comprehensive Platform Wiki and Landing Site</h1>
+        <p class="lead">
+          End-to-end platform for YouTube success prediction, channel clustering, global
+          intelligence visualization, and production MLOps delivery across AWS, GCP, Azure, and OCI.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#architecture">Explore Architecture</a>
+          <a class="btn btn-secondary" href="#command-center">Open Command Center</a>
+          <a class="btn btn-ghost" href="README.md">Repository README</a>
+        </div>
+        <div class="metrics-grid">
+          <article
+            class="metric-card reveal searchable"
+            data-search="ml pillars prediction clustering map"
+          >
+            <h3 data-count="3">0</h3>
+            <p>Core ML pillars (predict, cluster, map)</p>
+          </article>
+          <article
+            class="metric-card reveal searchable"
+            data-search="cloud providers aws gcp azure oci"
+          >
+            <h3 data-count="4">0</h3>
+            <p>Supported production cloud providers</p>
+          </article>
+          <article
+            class="metric-card reveal searchable"
+            data-search="deployment canary blue green rolling"
+          >
+            <h3 data-count="3">0</h3>
+            <p>Deployment strategies (rolling/canary/bluegreen)</p>
+          </article>
+          <article class="metric-card reveal searchable" data-search="api mlops analytics features">
+            <h3 data-count="20">0</h3>
+            <p>Major API and platform capability surfaces</p>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="capabilities"
+        class="container section reveal"
+        data-search="capabilities prediction clustering visualization"
+      >
+        <div class="section-head">
+          <p class="kicker">What The Platform Delivers</p>
+          <h2>Capability Surface</h2>
+        </div>
+        <div class="feature-grid">
+          <article
+            class="feature-card reveal searchable"
+            data-search="prediction subscribers earnings growth batch simulate recommendation"
+          >
+            <h3>1. Success Prediction System</h3>
+            <p>
+              Inputs: uploads, category, country, age. Outputs: predicted subscribers, predicted
+              earnings, predicted growth.
+            </p>
+            <ul>
+              <li>Single and batch inference</li>
+              <li>Simulation and recommendation endpoints</li>
+              <li>FastAPI + Flask compatibility</li>
+            </ul>
+          </article>
+          <article
+            class="feature-card reveal searchable"
+            data-search="clustering kmeans dbscan archetypes viral entertainers educators"
+          >
+            <h3>2. Channel Clustering</h3>
+            <p>
+              Unsupervised segmentation via KMeans and DBSCAN to identify strategic archetypes
+              across channel behavior.
+            </p>
+            <ul>
+              <li>Viral entertainers</li>
+              <li>Consistent educators</li>
+              <li>High earning low upload and high upload low growth</li>
+            </ul>
+          </article>
+          <article
+            class="feature-card reveal searchable"
+            data-search="maps charts country category influence plotly folium"
+          >
+            <h3>3. Global Visualization</h3>
+            <p>
+              Country/category influence analytics and map-ready data products for dashboard
+              storytelling and decisions.
+            </p>
+            <ul>
+              <li>Country metrics APIs</li>
+              <li>Charts page with post-processed views</li>
+              <li>Plotly/Folium map artifacts</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="architecture"
+        class="container section reveal"
+        data-search="architecture diagrams data pipeline frontend routes api lifecycle"
+      >
+        <div class="section-head">
+          <p class="kicker">System Design</p>
+          <h2>Architecture Views</h2>
+        </div>
+        <div class="chart-grid">
+          <article
+            class="chart-card reveal searchable"
+            data-search="components frontend api services supervised clustering artifacts manifest"
+          >
+            <h3>Platform Components</h3>
+            <pre class="mermaid">
+flowchart LR
+  FE[Next.js Frontend] --> API[FastAPI/Flask]
+  API --> SVC[Intelligence Services]
+  SVC --> SUP[Supervised Models]
+  SVC --> CLU[Clustering Models]
+  SVC --> MLOPS[MLOps Artifacts]
+  SUP --> ART[(artifacts/models)]
+  CLU --> ART
+  MLOPS --> REP[(reports + manifest + registry)]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="data pipeline feature engineering quality reports bundle registry"
+          >
+            <h3>Data And Feature Pipeline</h3>
+            <pre class="mermaid">
+flowchart TD
+  RAW[Raw CSV Dataset] --> LOAD[data.loader]
+  LOAD --> CLEAN[Type coercion and null handling]
+  CLEAN --> FEAT[Feature engineering]
+  FEAT --> TRAIN[Train supervised and clustering]
+  TRAIN --> EVAL[Metrics and quality reports]
+  EVAL --> PUBLISH[Bundle artifacts and registry update]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="request lifecycle api router predictor service artifacts inference"
+          >
+            <h3>Request Lifecycle</h3>
+            <pre class="mermaid">
+sequenceDiagram
+  participant U as User
+  participant FE as Frontend
+  participant API as API Router
+  participant S as Predictor Service
+  participant A as Artifacts
+
+  U->>FE: submit channel inputs
+  FE->>API: POST /predict
+  API->>S: validate and infer
+  S->>A: load active model bundle
+  A-->>S: model + preprocessing pipeline
+  S-->>API: predictions + cluster context
+  API-->>FE: response payload
+  FE-->>U: charts, explainability, recommendations
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="frontend next routes charts lab wiki"
+          >
+            <h3>Frontend Route Topology</h3>
+            <pre class="mermaid">
+flowchart LR
+  APP["Next.js App Router"] --> HOME["Route: /"]
+  APP --> CHARTS["Route: /visualizations/charts"]
+  APP --> LAB["Route: /intelligence/lab"]
+  APP --> WIKI["Route: /wiki"]
+  HOME --> PREDICT["Prediction workflows"]
+  CHARTS --> ANALYTICS["Post-processing charts"]
+  LAB --> EXPLAIN["Simulation and explainability"]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="api gateway security validation model availability"
+          >
+            <h3>Inference Guardrails</h3>
+            <pre class="mermaid">
+flowchart TD
+  IN[Incoming payload] --> VALIDATE[Pydantic validation]
+  VALIDATE --> READY{Artifacts ready?}
+  READY -- no --> E503[503 not_ready]
+  READY -- yes --> SERVE[Predictor service]
+  SERVE --> OUT[Typed response]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="observability metrics readiness health endpoints"
+          >
+            <h3>Observability Surface</h3>
+            <pre class="mermaid">
+flowchart LR
+  Client --> HEALTH["/health"]
+  Client --> READY["/ready"]
+  Client --> METRICS["/metrics"]
+  METRICS --> Dashboards[Grafana/Prometheus]
+  READY --> Alerts[Release gating]
+            </pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="mlops"
+        class="container section reveal"
+        data-search="mlops lineage drift readiness registry manifest"
+      >
+        <div class="section-head">
+          <p class="kicker">Quality, Governance, Reliability</p>
+          <h2>MLOps Lifecycle</h2>
+        </div>
+        <div class="chart-grid">
+          <article
+            class="chart-card reveal searchable"
+            data-search="artifact lineage training manifest registry run id"
+          >
+            <h3>Artifact Lineage</h3>
+            <pre class="mermaid">
+flowchart LR
+  T[Training Run] --> M1[supervised_bundle.joblib]
+  T --> M2[clustering_bundle.joblib]
+  T --> R1[training_metrics.json]
+  T --> R2[data_quality_report.json]
+  T --> MAN[training_manifest.json]
+  MAN --> REG[model_registry.json]
+  REG --> ACTIVE[active_run_id]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="drift detection numeric categorical severity retraining"
+          >
+            <h3>Drift Detection Process</h3>
+            <pre class="mermaid">
+flowchart TD
+  INPUT["Incoming payload sample"] --> DRIFT["Endpoint: /mlops/drift-check"]
+  DRIFT --> NUM["Numeric z-score checks"]
+  DRIFT --> CAT["Categorical frequency checks"]
+  NUM --> SCORE[Severity aggregation]
+  CAT --> SCORE
+  SCORE --> DECISION{High severity?}
+  DECISION -- yes --> RETRAIN[Trigger retraining workflow]
+  DECISION -- no --> SERVE[Continue active run]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="service readiness boot not ready serving drift risk"
+          >
+            <h3>Service Readiness Model</h3>
+            <pre class="mermaid">
+stateDiagram-v2
+  [*] --> Boot
+  Boot --> NotReady: artifacts missing
+  Boot --> Ready: artifacts found
+  NotReady --> Train
+  Train --> Ready
+  Ready --> Serving
+  Serving --> DriftRisk
+  DriftRisk --> Train
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="promotion rollback runbook approval gates"
+          >
+            <h3>Model Promotion And Rollback</h3>
+            <pre class="mermaid">
+sequenceDiagram
+  participant Train as Training Pipeline
+  participant Reg as model_registry.json
+  participant API as Inference API
+  participant Ops as Operator
+
+  Train->>Reg: append run and set active_run_id
+  API->>Reg: load active run
+  Ops->>Reg: rollback to prior run if needed
+  API-->>Ops: serving previous stable run
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="mlops lifecycle orchestration monitor retrain register deploy"
+          >
+            <h3>MLOps Lifecycle Orchestration</h3>
+            <pre class="mermaid">
+flowchart LR
+  DATA["Data intake"] --> TRAIN["Model training"]
+  TRAIN --> EVAL["Evaluation + quality gates"]
+  EVAL --> REG["Register artifacts + manifest"]
+  REG --> DEPLOY["Deploy active run"]
+  DEPLOY --> MONITOR["Health + drift monitoring"]
+  MONITOR --> RETRAIN{"Retrain needed?"}
+  RETRAIN -- yes --> TRAIN
+  RETRAIN -- no --> DEPLOY
+            </pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="deployment"
+        class="container section reveal"
+        data-search="deployment jenkins argo terraform aws gcp azure oci canary blue green"
+      >
+        <div class="section-head">
+          <p class="kicker">Production Delivery</p>
+          <h2>Multi-Cloud CI/CD and GitOps</h2>
+        </div>
+        <div class="chart-grid">
+          <article
+            class="chart-card reveal searchable"
+            data-search="jenkins argo sync docker build push overlay"
+          >
+            <h3>Jenkins + Argo Delivery Flow</h3>
+            <pre class="mermaid">
+flowchart LR
+  COMMIT[Git Commit] --> J[Jenkins Pipeline]
+  J --> TEST[Train + test + frontend build]
+  J --> IMG[Build and push containers]
+  IMG --> REG[Cloud registry]
+  J --> KUST[Update kustomize overlay]
+  KUST --> ARGO[Argo CD sync]
+  ARGO --> K8S[Kubernetes rollout]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="rolling canary bluegreen strategy control"
+          >
+            <h3>Deployment Strategy Control</h3>
+            <pre class="mermaid">
+flowchart TD
+  STRAT[Selected strategy] --> ROLLING[rolling overlay]
+  STRAT --> CANARY[canary overlay]
+  STRAT --> BG[bluegreen overlay]
+  ROLLING --> D[Deployment controller]
+  CANARY --> AR[Argo Rollouts canary]
+  BG --> ARBG[Argo Rollouts bluegreen]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="cloud packs aws gcp azure oci terraform"
+          >
+            <h3>Cloud Provider Packs</h3>
+            <pre class="mermaid">
+flowchart TB
+  TF[Terraform roots] --> AWS[AWS: EKS + ECR + S3]
+  TF --> GCP[GCP: GKE + Artifact Registry + GCS]
+  TF --> AZ[Azure: AKS + ACR + Blob]
+  TF --> OCI[OCI: OKE + OCIR + Object Storage]
+  AWS --> K8S1[Kubernetes runtime]
+  GCP --> K8S2[Kubernetes runtime]
+  AZ --> K8S3[Kubernetes runtime]
+  OCI --> K8S4[Kubernetes runtime]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="canary rollout steps analysis promotion"
+          >
+            <h3>Canary Rollout Sequence</h3>
+            <pre class="mermaid">
+sequenceDiagram
+  participant CI as Jenkins
+  participant Argo as Argo Rollouts
+  participant SVC as Service
+
+  CI->>Argo: deploy canary image
+  Argo->>SVC: route 10% traffic
+  Argo->>SVC: route 25% traffic
+  Argo->>SVC: route 50% traffic
+  Argo->>SVC: run analysis template
+  Argo->>SVC: promote 100%
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="multi cloud ci cd gitops lanes aws gcp azure oci"
+          >
+            <h3>Multi-Cloud Delivery Lanes</h3>
+            <pre class="mermaid">
+flowchart TB
+  CI["Jenkins CI"] --> GITOPS["GitOps overlay commit"]
+  GITOPS --> ARGO["Argo CD controller"]
+  ARGO --> AWSLANE["AWS lane"]
+  ARGO --> GCPLANE["GCP lane"]
+  ARGO --> AZLANE["Azure lane"]
+  ARGO --> OCILANE["OCI lane"]
+  AWSLANE --> AWSC["EKS workload rollout"]
+  GCPLANE --> GCPC["GKE workload rollout"]
+  AZLANE --> AZC["AKS workload rollout"]
+  OCILANE --> OCIC["OKE workload rollout"]
+            </pre>
+          </article>
+        </div>
+
+        <article
+          class="provider-matrix reveal searchable"
+          data-search="provider matrix terraform root environment"
+        >
+          <h3>Cloud Integration Matrix</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Kubernetes</th>
+                <th>Container Registry</th>
+                <th>Artifact Storage</th>
+                <th>Terraform Root</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AWS</td>
+                <td>EKS</td>
+                <td>ECR</td>
+                <td>S3</td>
+                <td><code>infra/terraform/environments/aws</code></td>
+              </tr>
+              <tr>
+                <td>GCP</td>
+                <td>GKE</td>
+                <td>Artifact Registry</td>
+                <td>GCS</td>
+                <td><code>infra/terraform/environments/gcp</code></td>
+              </tr>
+              <tr>
+                <td>Azure</td>
+                <td>AKS</td>
+                <td>ACR</td>
+                <td>Blob Storage</td>
+                <td><code>infra/terraform/environments/azure</code></td>
+              </tr>
+              <tr>
+                <td>OCI</td>
+                <td>OKE</td>
+                <td>OCIR</td>
+                <td>Object Storage</td>
+                <td><code>infra/terraform/environments/oci</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      </section>
+
+      <section
+        id="command-center"
+        class="container section reveal"
+        data-search="commands make kubectl terraform jenkins argo smoke tests"
+      >
+        <div class="section-head">
+          <p class="kicker">Operator Toolkit</p>
+          <h2>Command Center</h2>
+        </div>
+        <div class="runbook-grid">
+          <article class="runbook-card reveal searchable" data-search="local bootstrap train test">
+            <h3>Local ML + API Bootstrap</h3>
+            <pre id="cmd-local"><code>source .venv/bin/activate
+PYTHONPATH=src python -m youtube_success_ml.train --run-all
+PYTHONPATH=src pytest -q
+PYTHONPATH=src uvicorn youtube_success_ml.api.fastapi_app:app --host 0.0.0.0 --port 8000</code></pre>
+            <button class="copy-btn" data-copy-target="cmd-local" type="button">Copy</button>
+          </article>
+          <article class="runbook-card reveal searchable" data-search="frontend dev build lint">
+            <h3>Frontend Lifecycle</h3>
+            <pre id="cmd-frontend"><code>cd frontend
+npm ci
+npm run lint
+npm run build
+npm run dev</code></pre>
+            <button class="copy-btn" data-copy-target="cmd-frontend" type="button">Copy</button>
+          </article>
+          <article
+            class="runbook-card reveal searchable"
+            data-search="kubernetes render validate overlays"
+          >
+            <h3>Kubernetes Render Checks</h3>
+            <pre id="cmd-k8s"><code>kubectl kustomize infra/k8s/overlays/rolling
+kubectl kustomize infra/k8s/overlays/canary
+kubectl kustomize infra/k8s/overlays/bluegreen</code></pre>
+            <button class="copy-btn" data-copy-target="cmd-k8s" type="button">Copy</button>
+          </article>
+          <article class="runbook-card reveal searchable" data-search="argo strategy switching">
+            <h3>Argo Strategy Switching</h3>
+            <pre id="cmd-argo"><code>bash infra/argocd/bootstrap.sh
+bash infra/argocd/switch-strategy.sh canary
+bash infra/argocd/switch-strategy.sh bluegreen
+bash infra/argocd/switch-strategy.sh rolling</code></pre>
+            <button class="copy-btn" data-copy-target="cmd-argo" type="button">Copy</button>
+          </article>
+          <article
+            class="runbook-card reveal searchable"
+            data-search="terraform aws gcp azure oci plan"
+          >
+            <h3>Terraform Apply Pattern</h3>
+            <pre id="cmd-tf"><code>cd infra/terraform/environments/aws
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply</code></pre>
+            <button class="copy-btn" data-copy-target="cmd-tf" type="button">Copy</button>
+          </article>
+          <article class="runbook-card reveal searchable" data-search="docker compose local stack">
+            <h3>Container Stack</h3>
+            <pre id="cmd-compose"><code>docker compose up --build</code></pre>
+            <button class="copy-btn" data-copy-target="cmd-compose" type="button">Copy</button>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="roadmap"
+        class="container section reveal"
+        data-search="release roadmap checklist qa gates"
+      >
+        <div class="section-head">
+          <p class="kicker">Release Governance</p>
+          <h2>Delivery Roadmap And Checklist</h2>
+        </div>
+
+        <div class="timeline">
+          <article
+            class="timeline-item reveal searchable"
+            data-search="phase 1 data ml train quality"
+          >
+            <h3>Phase 1: Data + ML Integrity</h3>
+            <p>
+              Run training pipeline, produce artifacts, validate metrics and data quality reports.
+            </p>
+          </article>
+          <article
+            class="timeline-item reveal searchable"
+            data-search="phase 2 api frontend contract readiness"
+          >
+            <h3>Phase 2: API + Frontend Validation</h3>
+            <p>Pass `pytest`, frontend lint/build, and confirm `/health` + `/ready` contracts.</p>
+          </article>
+          <article
+            class="timeline-item reveal searchable"
+            data-search="phase 3 container registry push"
+          >
+            <h3>Phase 3: Container Build and Push</h3>
+            <p>
+              Build API/frontend images from the same repo revision and publish to cloud registry.
+            </p>
+          </article>
+          <article
+            class="timeline-item reveal searchable"
+            data-search="phase 4 gitops rollout canary bluegreen"
+          >
+            <h3>Phase 4: GitOps Strategy Rollout</h3>
+            <p>Sync rolling/canary/bluegreen overlays through Argo CD and verify rollout health.</p>
+          </article>
+          <article
+            class="timeline-item reveal searchable"
+            data-search="phase 5 observe rollback promote"
+          >
+            <h3>Phase 5: Observe, Promote, Rollback</h3>
+            <p>
+              Gate promotions, monitor SLO signals, and execute rollback if regression is detected.
+            </p>
+          </article>
+        </div>
+
+        <article
+          class="checklist-card reveal searchable"
+          data-search="release checklist production readiness"
+        >
+          <h3>Release Checklist</h3>
+          <p class="checklist-meta"><strong id="checklist-progress">0/8</strong> completed</p>
+          <div class="checklist-items">
+            <label
+              ><input type="checkbox" data-check-item="train" /> Training run completed
+              successfully</label
+            >
+            <label><input type="checkbox" data-check-item="tests" /> Backend tests green</label>
+            <label
+              ><input type="checkbox" data-check-item="frontend" /> Frontend lint/build green</label
+            >
+            <label
+              ><input type="checkbox" data-check-item="images" /> Images pushed to target
+              registry</label
+            >
+            <label
+              ><input type="checkbox" data-check-item="terraform" /> Terraform plan/apply
+              verified</label
+            >
+            <label><input type="checkbox" data-check-item="argo" /> Argo sync healthy</label>
+            <label
+              ><input type="checkbox" data-check-item="probes" /> `/health` and `/ready`
+              validated</label
+            >
+            <label
+              ><input type="checkbox" data-check-item="rollback" /> Rollback path tested in
+              staging</label
+            >
+          </div>
+        </article>
+      </section>
+
+      <section
+        id="runbook"
+        class="container section reveal"
+        data-search="runbook operations smoke ready endpoint"
+      >
+        <div class="section-head">
+          <p class="kicker">Execution Playbook</p>
+          <h2>Operator Runbook</h2>
+        </div>
+        <div class="runbook-grid">
+          <article class="runbook-card reveal searchable" data-search="smoke api verify">
+            <h3>Smoke API</h3>
+            <pre><code>bash scripts/smoke_api.sh http://127.0.0.1:8000</code></pre>
+          </article>
+          <article class="runbook-card reveal searchable" data-search="ready endpoint verify">
+            <h3>Readiness Verification</h3>
+            <pre><code>curl -i http://127.0.0.1:8000/ready</code></pre>
+          </article>
+          <article
+            class="runbook-card reveal searchable"
+            data-search="jenkins parameters provider strategy"
+          >
+            <h3>Jenkins Inputs</h3>
+            <pre><code>CLOUD_PROVIDER=(aws|gcp|azure|oci)
+DEPLOY_STRATEGY=(rolling|canary|bluegreen)
+RUN_TERRAFORM_APPLY=(true|false)
+IMAGE_TAG=(optional)</code></pre>
+          </article>
+          <article class="runbook-card reveal searchable" data-search="incident response rollback">
+            <h3>Incident Response</h3>
+            <pre><code>kubectl argo rollouts abort yts-api -n yts-prod
+kubectl argo rollouts abort yts-frontend -n yts-prod
+kubectl argo rollouts undo yts-api -n yts-prod</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="docs"
+        class="container section reveal"
+        data-search="documentation readme architecture deployment mlops api frontend infra"
+      >
+        <div class="section-head">
+          <p class="kicker">Documentation Index</p>
+          <h2>Deep-Dive Documents</h2>
+        </div>
+        <div class="docs-grid">
+          <a
+            class="doc-card reveal searchable"
+            href="README.md"
+            data-search="readme project overview"
+          >
+            <h3>README.md</h3>
+            <p>Platform overview, setup, APIs, and operations entrypoint.</p>
+          </a>
+          <a
+            class="doc-card reveal searchable"
+            href="ARCHITECTURE.md"
+            data-search="architecture design diagrams"
+          >
+            <h3>ARCHITECTURE.md</h3>
+            <p>Detailed system design, interaction models, and reliability views.</p>
+          </a>
+          <a
+            class="doc-card reveal searchable"
+            href="DEPLOYMENT.md"
+            data-search="deployment jenkins argo terraform"
+          >
+            <h3>DEPLOYMENT.md</h3>
+            <p>Jenkins, Argo CD, K8s, and multi-cloud Terraform workflows.</p>
+          </a>
+          <a
+            class="doc-card reveal searchable"
+            href="MLOPS.md"
+            data-search="mlops drift registry manifest"
+          >
+            <h3>MLOPS.md</h3>
+            <p>Model lineage, governance, drift checks, and promotion policy.</p>
+          </a>
+          <a
+            class="doc-card reveal searchable"
+            href="API_REFERENCE.md"
+            data-search="api reference contract endpoints"
+          >
+            <h3>API_REFERENCE.md</h3>
+            <p>Endpoint contracts for prediction, clustering, analytics, and health.</p>
+          </a>
+          <a
+            class="doc-card reveal searchable"
+            href="FRONTEND.md"
+            data-search="frontend routes seo charts"
+          >
+            <h3>FRONTEND.md</h3>
+            <p>Route topology, charts UX, SEO metadata, and integration model.</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="faq" class="container section reveal" data-search="faq questions answers">
+        <div class="section-head">
+          <p class="kicker">Frequently Asked Questions</p>
+          <h2>Operational FAQ</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item searchable" data-search="terraform missing cli">
+            <summary>What if Terraform is not installed on a runner?</summary>
+            <p>
+              Install Terraform in the Jenkins agent image or use a dedicated IaC stage container
+              before `terraform_plan_apply.sh`.
+            </p>
+          </details>
+          <details class="faq-item searchable" data-search="canary bluegreen switch">
+            <summary>How do we change rollout strategy safely?</summary>
+            <p>
+              Use `infra/argocd/switch-strategy.sh` to enforce one active strategy app, then sync
+              via Argo and monitor health.
+            </p>
+          </details>
+          <details class="faq-item searchable" data-search="artifacts ready 503">
+            <summary>Why might `/ready` return 503?</summary>
+            <p>
+              Artifacts are missing or inaccessible. Run training and verify mounted artifact
+              storage before deployment sync.
+            </p>
+          </details>
+          <details class="faq-item searchable" data-search="where wiki lives">
+            <summary>Where is this wiki hosted in the app?</summary>
+            <p>
+              Static assets are served from `frontend/public/wiki` and available through the Next
+              route `/wiki`.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <button id="back-to-top" class="backTop" type="button" aria-label="Back to top">↑</button>
+
+    <footer class="footer container">
+      <p>Built for production ML engineering portfolios and real platform operations.</p>
+      <p class="footer-links">
+        <a href="infra/README.md">Infra Guide</a>
+        <a href="infra/k8s/README.md">Kubernetes Guide</a>
+        <a href="infra/terraform/README.md">Terraform Guide</a>
+      </p>
+    </footer>
+
+    <script src="info/script.js"></script>
+  </body>
+</html>

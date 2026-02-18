@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: yts-api-success-rate
+spec:
+  args:
+    - name: service-name
+      value: yts-api
+  metrics:
+    - name: api-ready-success
+      interval: 30s
+      count: 5
+      successCondition: result == "ok"
+      failureLimit: 1
+      provider:
+        web:
+          url: "http://{{args.service-name}}.yts-prod.svc.cluster.local:8000/health"
+          method: GET
+          jsonPath: "{.status}"

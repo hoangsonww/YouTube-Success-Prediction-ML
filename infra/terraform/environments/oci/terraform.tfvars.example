@@ -1,0 +1,15 @@
+tenancy_ocid     = "ocid1.tenancy.oc1..example"
+user_ocid        = "ocid1.user.oc1..example"
+fingerprint      = "aa:bb:cc:dd:ee"
+private_key_path = "~/.oci/oci_api_key.pem"
+region           = "us-ashburn-1"
+compartment_id   = "ocid1.compartment.oc1..example"
+environment      = "prod"
+cluster_name     = "yts-oke-prod"
+owner            = "ml-platform"
+cost_center      = "ml-001"
+
+extra_tags = {
+  data_classification = "internal"
+  business_unit       = "ai"
+}

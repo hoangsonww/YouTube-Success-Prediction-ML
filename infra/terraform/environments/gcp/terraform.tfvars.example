@@ -1,0 +1,12 @@
+project_id   = "replace-project"
+region       = "us-central1"
+zone         = "us-central1-a"
+environment  = "prod"
+cluster_name = "yts-gke-prod"
+owner        = "ml-platform"
+cost_center  = "ml-001"
+
+extra_tags = {
+  data_classification = "internal"
+  business_unit       = "ai"
+}

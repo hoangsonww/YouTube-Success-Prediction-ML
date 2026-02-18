@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: youtube-success-ml
+  namespace: argocd
+spec:
+  description: Multi-cloud GitOps project for YouTube Success ML platform.
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: yts-prod
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

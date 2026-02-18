@@ -1,0 +1,11 @@
+resource_group_name = "rg-yts-prod"
+location            = "eastus"
+environment         = "prod"
+cluster_name        = "yts-aks-prod"
+owner               = "ml-platform"
+cost_center         = "ml-001"
+
+extra_tags = {
+  data_classification = "internal"
+  business_unit       = "ai"
+}

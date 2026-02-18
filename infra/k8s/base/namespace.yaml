@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: yts-prod
+  labels:
+    app.kubernetes.io/name: youtube-success-ml
+    app.kubernetes.io/instance: prod

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yts-api
+  labels:
+    app.kubernetes.io/name: yts-api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: yts-api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

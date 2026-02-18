@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: yts-ingress
+spec:
+  tls:
+    - hosts:
+        - api.youtube-success.example.com
+        - youtube-success.example.com
+      secretName: yts-tls
+  rules:
+    - host: api.youtube-success.example.com
+    - host: youtube-success.example.com
