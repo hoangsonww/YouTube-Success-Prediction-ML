@@ -131,4 +131,3 @@ We recommend using Vercel for frontend deployment, as it is the most compatible 
 
 > [!TIP]
 > A demo frontend is also available at [https://youtube-success.vercel.app](https://youtube-success.vercel.app). Only the UI demo is available. For it to be fully functional, please set up the backend API and ML serving locally.
-

@@ -432,4 +432,8 @@ For local development and testing, `docker compose` provides a quick way to run 
 
 ## 13) Frontend Deployment
 
-We recommend deploying frontend on Vercel due to convenience and ease of deployment. FYI, a demo frontend is available on Vercel at: [https://youtube-success.vercel.app](https://youtube-success.vercel.app). However, backend functionalities are not connected. Please run the backend API and AI/ML functionalities to enjoy all features of the platform.
+We recommend deploying frontend on Vercel due to convenience and ease of deployment. 
+
+FYI, a demo frontend is available on Vercel at: [https://youtube-success.vercel.app](https://youtube-success.vercel.app). However, backend functionalities are not connected. Please run the backend API and AI/ML functionalities to enjoy all features of the platform.
+
+To deploy on Vercel, simply connect your fork of the repository to Vercel, select the frontend directory as the project root, and use the Next.js preset. Set the environment variable `NEXT_PUBLIC_API_BASE_URL` to point to your deployed API host for full functionality.
