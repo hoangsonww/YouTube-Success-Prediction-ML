@@ -195,12 +195,26 @@
         <h1>Comprehensive Platform Wiki and Landing Site</h1>
         <p class="lead">
           End-to-end platform for YouTube success prediction, channel clustering, global
-          intelligence visualization, and production MLOps delivery across AWS, GCP, Azure, and OCI.
+          intelligence visualization, and production MLOps delivery across AWS, GCP, Azure, and OCI,
+          with a Next.js frontend, FastAPI backend, and Kubernetes deployment architecture.
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#architecture">Explore Architecture</a>
           <a class="btn btn-secondary" href="#command-center">Open Command Center</a>
-          <a class="btn btn-ghost" href="README.md">Repository README</a>
+          <a
+            class="btn btn-ghost"
+            href="https://youtube-success.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Frontend Demo</a
+          >
+          <a
+            class="btn btn-ghost"
+            href="Rhttps://github.com/hoangsonww/YouTube-Success-Prediction-ML"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub Repository</a
+          >
         </div>
         <div class="metrics-grid">
           <article
@@ -766,47 +780,49 @@ flowchart LR
           data-search="provider matrix terraform root environment"
         >
           <h3>Cloud Integration Matrix</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Provider</th>
-                <th>Kubernetes</th>
-                <th>Container Registry</th>
-                <th>Artifact Storage</th>
-                <th>Terraform Root</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>AWS</td>
-                <td>EKS</td>
-                <td>ECR</td>
-                <td>S3</td>
-                <td><code>infra/terraform/environments/aws</code></td>
-              </tr>
-              <tr>
-                <td>GCP</td>
-                <td>GKE</td>
-                <td>Artifact Registry</td>
-                <td>GCS</td>
-                <td><code>infra/terraform/environments/gcp</code></td>
-              </tr>
-              <tr>
-                <td>Azure</td>
-                <td>AKS</td>
-                <td>ACR</td>
-                <td>Blob Storage</td>
-                <td><code>infra/terraform/environments/azure</code></td>
-              </tr>
-              <tr>
-                <td>OCI</td>
-                <td>OKE</td>
-                <td>OCIR</td>
-                <td>Object Storage</td>
-                <td><code>infra/terraform/environments/oci</code></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="provider-matrix-scroll" role="region" aria-label="Cloud integration matrix">
+            <table>
+              <thead>
+                <tr>
+                  <th>Provider</th>
+                  <th>Kubernetes</th>
+                  <th>Container Registry</th>
+                  <th>Artifact Storage</th>
+                  <th>Terraform Root</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AWS</td>
+                  <td>EKS</td>
+                  <td>ECR</td>
+                  <td>S3</td>
+                  <td><code>infra/terraform/environments/aws</code></td>
+                </tr>
+                <tr>
+                  <td>GCP</td>
+                  <td>GKE</td>
+                  <td>Artifact Registry</td>
+                  <td>GCS</td>
+                  <td><code>infra/terraform/environments/gcp</code></td>
+                </tr>
+                <tr>
+                  <td>Azure</td>
+                  <td>AKS</td>
+                  <td>ACR</td>
+                  <td>Blob Storage</td>
+                  <td><code>infra/terraform/environments/azure</code></td>
+                </tr>
+                <tr>
+                  <td>OCI</td>
+                  <td>OKE</td>
+                  <td>OCIR</td>
+                  <td>Object Storage</td>
+                  <td><code>infra/terraform/environments/oci</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </article>
       </section>
 
@@ -1077,6 +1093,19 @@ kubectl argo rollouts undo yts-api -n yts-prod</code></pre>
           >
             <h3>FRONTEND.md</h3>
             <p>Route topology, charts UX, SEO metadata, and integration model.</p>
+          </a>
+          <a
+            class="doc-card reveal searchable"
+            href="https://youtube-success.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-search="nextjs frontend demo vercel live app"
+          >
+            <h3>Live Frontend Demo</h3>
+            <p>
+              Next.js production demo on Vercel:
+              <code>https://youtube-success.vercel.app</code>.
+            </p>
           </a>
         </div>
       </section>

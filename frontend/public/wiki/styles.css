@@ -250,6 +250,39 @@ a {
   flex-wrap: wrap;
 }
 
+.hero-cta .btn {
+  border-radius: 14px;
+  padding: 0.82rem 1.24rem;
+  border: 1px solid rgba(166, 186, 233, 0.34);
+  backdrop-filter: blur(7px);
+  transition:
+    transform 0.24s ease,
+    box-shadow 0.24s ease,
+    border-color 0.24s ease,
+    background 0.24s ease;
+}
+
+.hero-cta .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(5, 10, 22, 0.42);
+  border-color: rgba(166, 186, 233, 0.52);
+}
+
+.hero-cta .btn-primary {
+  background: linear-gradient(125deg, #43d9c7 0%, #36b9ac 48%, #2a9f95 100%);
+  color: #021318;
+}
+
+.hero-cta .btn-secondary {
+  background: linear-gradient(125deg, #5ba4ff 0%, #4a8df0 52%, #356fca 100%);
+  color: #f4f8ff;
+}
+
+.hero-cta .btn-ghost {
+  background: linear-gradient(125deg, rgba(79, 149, 255, 0.2), rgba(62, 201, 184, 0.12));
+  border-color: rgba(166, 186, 233, 0.42);
+}
+
 .hero.reveal.in-view .kicker,
 .hero.reveal.in-view h1,
 .hero.reveal.in-view .lead,
@@ -441,7 +474,13 @@ a {
   margin-top: 1rem;
   padding: 1rem;
   max-width: 100%;
+}
+
+.provider-matrix-scroll {
+  margin-top: 0.55rem;
+  max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -449,7 +488,6 @@ a {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  margin-top: 0.55rem;
   font-size: 0.94rem;
 }
 
@@ -833,7 +871,7 @@ a {
     text-align: center;
   }
 
-  .provider-matrix table {
+  .provider-matrix-scroll table {
     font-size: 0.84rem;
     min-width: 560px;
   }
