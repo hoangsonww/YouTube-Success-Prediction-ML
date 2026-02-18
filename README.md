@@ -457,6 +457,9 @@ npm install
 npm run dev
 ```
 
+> [!TIP]
+> A demo frontend is also available at [https://youtube-success.vercel.app](https://youtube-success.vercel.app). Only the UI demo is available. For it to be fully functional, please set up the backend API and ML serving locally.
+
 ## Environment Configuration
 
 ### Training Environment Variables
