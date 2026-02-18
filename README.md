@@ -181,6 +181,30 @@ The platform implements the following core capabilities:
   - dedicated `/visualizations/charts` route with raw vs processed data presentation
   - dedicated `/intelligence/lab` route for advanced model operations and drift-aware analysis
 
+<p align="center">
+  <img src="images/overview.png" alt="Platform Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/charts-1.png" alt="Dashboard Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/charts-2.png" alt="Dashboard Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/charts-3.png" alt="Intelligence Lab Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/lab-1.png" alt="Wiki Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/lab-2.png" alt="Wiki Mockup" width="100%">
+</p>
+
 ### 6) MLOps Artifacts
 
 Each training run produces:

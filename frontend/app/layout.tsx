@@ -4,6 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://youtube-success-ml.example.com"),
+  manifest: "/manifest.json",
   title: {
     default: "YouTube Success ML",
     template: "%s",

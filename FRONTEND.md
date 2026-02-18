@@ -4,6 +4,7 @@ This frontend is an app-router Next.js app (in `frontend/`) that consumes FastAP
 
 ## Table Of Contents
 
+- [User Interface Overview](#user-interface-overview)
 - [Document Metadata](#document-metadata)
 - [Documentation Map](#documentation-map)
 - [Routes](#routes)
@@ -12,6 +13,34 @@ This frontend is an app-router Next.js app (in `frontend/`) that consumes FastAP
 - [Charts Stack](#charts-stack)
 - [API Contract](#api-contract)
 - [Build And Validate](#build-and-validate)
+
+## User Interface Overview
+
+The UI is designed to provide a comprehensive dashboard for YouTube success prediction, featuring:
+
+<p align="center">
+  <img src="images/overview.png" alt="Platform Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/charts-1.png" alt="Dashboard Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/charts-2.png" alt="Dashboard Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/charts-3.png" alt="Intelligence Lab Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/lab-1.png" alt="Wiki Mockup" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/lab-2.png" alt="Wiki Mockup" width="100%">
+</p>
 
 ## Document Metadata
 

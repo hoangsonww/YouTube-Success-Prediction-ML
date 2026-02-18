@@ -37,6 +37,30 @@ const currency = new Intl.NumberFormat("en-US", {
   currency: "USD",
   maximumFractionDigits: 0,
 });
+const DEFAULT_BATCH_ITEMS: PredictionPayload[] = [
+  { uploads: 200, category: "Education", country: "United States", age: 4 },
+  { uploads: 1200, category: "Entertainment", country: "India", age: 8 },
+];
+const COMMON_CATEGORIES = [
+  "Education",
+  "Entertainment",
+  "Music",
+  "Film & Animation",
+  "People & Blogs",
+  "Gaming",
+  "Science & Technology",
+  "News & Politics",
+];
+const COMMON_COUNTRIES = [
+  "United States",
+  "India",
+  "United Kingdom",
+  "Canada",
+  "Brazil",
+  "Japan",
+  "South Korea",
+  "Germany",
+];
 
 function tooltipNumber(value: unknown) {
   return number.format(Number(value ?? 0));
@@ -79,12 +103,54 @@ function prettifyFeatureName(feature: string): { full: string; short: string } {
   return { full: fallback, short };
 }
 
+function clampInteger(value: number, min: number, max: number): number {
+  if (!Number.isFinite(value)) {
+    return min;
+  }
+  return Math.min(max, Math.max(min, Math.round(value)));
+}
+
+function toRecord(value: unknown, index: number): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Error(`Record ${index + 1} must be a JSON object.`);
+  }
+  return value as Record<string, unknown>;
+}
+
+function parseNonNegativeNumber(value: unknown, field: "uploads" | "age", index: number): number {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric < 0) {
+    throw new Error(`Record ${index + 1} has invalid "${field}". Use a non-negative number.`);
+  }
+  return numeric;
+}
+
+function parseRequiredText(value: unknown, field: "category" | "country", index: number): string {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new Error(`Record ${index + 1} has invalid "${field}". Use a non-empty string.`);
+  }
+  return value.trim();
+}
+
+function normalizeBatchRecord(value: unknown, index: number): PredictionPayload {
+  const row = toRecord(value, index);
+  return {
+    uploads: clampInteger(parseNonNegativeNumber(row.uploads, "uploads", index), 0, 5_000_000),
+    category: parseRequiredText(row.category, "category", index),
+    country: parseRequiredText(row.country, "country", index),
+    age: clampInteger(parseNonNegativeNumber(row.age, "age", index), 0, 100),
+  };
+}
+
 function parseBatchInput(text: string): PredictionPayload[] {
-  const parsed = JSON.parse(text) as PredictionPayload[];
+  const parsed = JSON.parse(text) as unknown;
   if (!Array.isArray(parsed)) {
     throw new Error("Payload must be a JSON array.");
   }
-  return parsed;
+  if (parsed.length === 0) {
+    throw new Error("Payload must include at least one record.");
+  }
+  return parsed.map((row, index) => normalizeBatchRecord(row, index));
 }
 
 export function IntelligenceLabClient() {
@@ -101,16 +167,11 @@ export function IntelligenceLabClient() {
   const [importance, setImportance] = useState<FeatureImportanceResponse | null>(null);
   const [drift, setDrift] = useState<DriftCheckResponse | null>(null);
 
-  const [batchText, setBatchText] = useState(
-    JSON.stringify(
-      [
-        { uploads: 200, category: "Education", country: "United States", age: 4 },
-        { uploads: 1200, category: "Entertainment", country: "India", age: 8 },
-      ],
-      null,
-      2
-    )
-  );
+  const [batchText, setBatchText] = useState(JSON.stringify(DEFAULT_BATCH_ITEMS, null, 2));
+  const [draftUploads, setDraftUploads] = useState(350);
+  const [draftCategory, setDraftCategory] = useState("Education");
+  const [draftCountry, setDraftCountry] = useState("United States");
+  const [draftAge, setDraftAge] = useState(5);
   const [batchResult, setBatchResult] = useState<BatchPredictionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -145,6 +206,95 @@ export function IntelligenceLabClient() {
         .slice(0, 10) ?? [],
     [importance]
   );
+
+  const batchValidation = useMemo(() => {
+    const trimmed = batchText.trim();
+    if (trimmed.length === 0 || trimmed === "[]") {
+      return { isValid: false, count: 0, message: "Add records or load a sample payload." };
+    }
+
+    try {
+      const items = parseBatchInput(batchText);
+      const suffix = items.length === 1 ? "" : "s";
+      return {
+        isValid: true,
+        count: items.length,
+        message: `${number.format(items.length)} record${suffix} ready for inference.`,
+      };
+    } catch (err) {
+      return {
+        isValid: false,
+        count: 0,
+        message: err instanceof Error ? err.message : "Invalid batch payload.",
+      };
+    }
+  }, [batchText]);
+
+  function setBatchPayload(items: PredictionPayload[]) {
+    setBatchText(JSON.stringify(items, null, 2));
+    setBatchResult(null);
+  }
+
+  function loadSampleBatch() {
+    setBatchPayload(DEFAULT_BATCH_ITEMS);
+    setError(null);
+  }
+
+  function clearBatchInput() {
+    setBatchText("[]");
+    setBatchResult(null);
+    setError(null);
+  }
+
+  function formatBatchInput() {
+    try {
+      const items = parseBatchInput(batchText);
+      setBatchPayload(items);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to format payload.");
+    }
+  }
+
+  function addDraftRecord(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+
+    try {
+      const trimmed = batchText.trim();
+      const base = trimmed.length === 0 || trimmed === "[]" ? [] : parseBatchInput(trimmed);
+      const categoryText = draftCategory.trim();
+      const countryText = draftCountry.trim();
+
+      if (!categoryText || !countryText) {
+        throw new Error("Draft record requires both category and country.");
+      }
+
+      const record: PredictionPayload = {
+        uploads: clampInteger(draftUploads, 0, 5_000_000),
+        category: categoryText,
+        country: countryText,
+        age: clampInteger(draftAge, 0, 100),
+      };
+
+      setBatchPayload([...base, record]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to add draft record.");
+    }
+  }
+
+  function removeLastRecord() {
+    try {
+      const base = parseBatchInput(batchText);
+      if (base.length === 0) {
+        return;
+      }
+      setBatchPayload(base.slice(0, -1));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to remove record.");
+    }
+  }
 
   async function runSimulationAndRecommendation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,6 +331,11 @@ export function IntelligenceLabClient() {
   }
 
   async function runBatchPrediction() {
+    if (!batchValidation.isValid) {
+      setError(batchValidation.message);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -367,78 +522,6 @@ export function IntelligenceLabClient() {
         </article>
       </section>
 
-      <section className="panel">
-        <div className="panelHeader">
-          <h2>Batch Prediction Workbench</h2>
-          <span className="chip">JSON + Structured Results</span>
-        </div>
-
-        <textarea
-          className="jsonArea"
-          value={batchText}
-          onChange={(e) => setBatchText(e.target.value)}
-          spellCheck={false}
-        />
-
-        <div className="rowActions">
-          <button
-            type="button"
-            className="primaryButton"
-            onClick={runBatchPrediction}
-            disabled={loading}
-          >
-            Run Batch Inference
-          </button>
-          {batchResult && <span className="mutedText">Batch run complete.</span>}
-        </div>
-
-        {batchResult && (
-          <>
-            <div className="batchSummaryGrid">
-              <article className="batchCard">
-                <p>Records</p>
-                <strong>{number.format(batchResult.summary.count)}</strong>
-              </article>
-              <article className="batchCard">
-                <p>Avg Subscribers</p>
-                <strong>{number.format(batchResult.summary.avg_predicted_subscribers)}</strong>
-              </article>
-              <article className="batchCard">
-                <p>Avg Earnings</p>
-                <strong>{currency.format(batchResult.summary.avg_predicted_earnings)}</strong>
-              </article>
-              <article className="batchCard">
-                <p>Avg Growth</p>
-                <strong>{number.format(batchResult.summary.avg_predicted_growth)}</strong>
-              </article>
-            </div>
-
-            <div className="tableShell">
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Predicted Subscribers</th>
-                    <th>Predicted Earnings</th>
-                    <th>Predicted Growth</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {batchResult.records.map((row, idx) => (
-                    <tr key={`batch-record-${idx}`}>
-                      <td>{idx + 1}</td>
-                      <td>{number.format(row.predicted_subscribers)}</td>
-                      <td>{currency.format(row.predicted_earnings)}</td>
-                      <td>{number.format(row.predicted_growth)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </section>
-
       {drift && (
         <section className="panel">
           <div className="panelHeader">
@@ -473,6 +556,188 @@ export function IntelligenceLabClient() {
           </div>
         </section>
       )}
+
+      <section className="panel">
+        <div className="panelHeader">
+          <h2>Batch Prediction Workbench</h2>
+          <span className="chip">JSON + Structured Results</span>
+        </div>
+
+        <p className="mutedText">
+          Build payloads with the guided form, then validate and run one-click inference on the
+          full batch.
+        </p>
+
+        <section className="batchInputGrid">
+          <form className="batchBuilder" onSubmit={addDraftRecord}>
+            <h3>Add Record</h3>
+            <label>
+              Uploads
+              <input
+                type="number"
+                min={0}
+                value={draftUploads}
+                onChange={(e) => setDraftUploads(Number(e.target.value))}
+              />
+            </label>
+            <label>
+              Age
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={draftAge}
+                onChange={(e) => setDraftAge(Number(e.target.value))}
+              />
+            </label>
+            <label>
+              Category
+              <input
+                list="batch-category-options"
+                value={draftCategory}
+                onChange={(e) => setDraftCategory(e.target.value)}
+              />
+            </label>
+            <label>
+              Country
+              <input
+                list="batch-country-options"
+                value={draftCountry}
+                onChange={(e) => setDraftCountry(e.target.value)}
+              />
+            </label>
+            <button type="submit" className="secondaryButton">
+              Add to Payload
+            </button>
+            <button
+              type="button"
+              className="ghostButton"
+              onClick={removeLastRecord}
+              disabled={!batchValidation.isValid || batchValidation.count === 0}
+            >
+              Remove Last
+            </button>
+          </form>
+
+          <div className="batchEditor">
+            <div className="batchEditorHeader">
+              <div>
+                <h3>Payload JSON</h3>
+                <p className="batchEditorHint">
+                  Auto-format validates schema and pretty-prints the batch payload.
+                </p>
+              </div>
+              <div className="batchEditorActions">
+                <button type="button" className="secondaryButton" onClick={formatBatchInput}>
+                  Auto-format JSON
+                </button>
+                <button type="button" className="ghostButton" onClick={loadSampleBatch}>
+                  Load Sample
+                </button>
+                <button type="button" className="ghostButton" onClick={clearBatchInput}>
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              className="jsonArea"
+              value={batchText}
+              onChange={(e) => {
+                setBatchText(e.target.value);
+                setBatchResult(null);
+              }}
+              spellCheck={false}
+            />
+
+            <p className={`batchValidation ${batchValidation.isValid ? "valid" : "invalid"}`}>
+              {batchValidation.message}
+            </p>
+          </div>
+        </section>
+
+        <datalist id="batch-category-options">
+          {COMMON_CATEGORIES.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+        <datalist id="batch-country-options">
+          {COMMON_COUNTRIES.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+
+        <div className="rowActions">
+          <button
+            type="button"
+            className="primaryButton"
+            onClick={runBatchPrediction}
+            disabled={loading || !batchValidation.isValid}
+          >
+            Run Batch Inference
+          </button>
+          {batchResult && (
+            <span className="mutedText">
+              Batch run complete with {number.format(batchResult.summary.count)} records.
+            </span>
+          )}
+        </div>
+
+        {batchResult && (
+          <>
+            <div className="batchSummaryGrid">
+              <article className="batchCard">
+                <p>Records</p>
+                <strong>{number.format(batchResult.summary.count)}</strong>
+              </article>
+              <article className="batchCard">
+                <p>Avg Subscribers</p>
+                <strong>{number.format(batchResult.summary.avg_predicted_subscribers)}</strong>
+              </article>
+              <article className="batchCard">
+                <p>Avg Earnings</p>
+                <strong>{currency.format(batchResult.summary.avg_predicted_earnings)}</strong>
+              </article>
+              <article className="batchCard">
+                <p>Avg Growth</p>
+                <strong>{number.format(batchResult.summary.avg_predicted_growth)}</strong>
+              </article>
+            </div>
+
+            <p className="batchSummaryLine">
+              count={number.format(batchResult.summary.count)}, avg_subscribers=
+              {number.format(batchResult.summary.avg_predicted_subscribers)}, avg_earnings=
+              {currency.format(batchResult.summary.avg_predicted_earnings)}, avg_growth=
+              {number.format(batchResult.summary.avg_predicted_growth)}
+            </p>
+
+            <div className="batchTableWrap">
+              <div className="tableShell">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Predicted Subscribers</th>
+                      <th>Predicted Earnings</th>
+                      <th>Predicted Growth</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {batchResult.records.map((row, idx) => (
+                      <tr key={`batch-record-${idx}`}>
+                        <td>{idx + 1}</td>
+                        <td>{number.format(row.predicted_subscribers)}</td>
+                        <td>{currency.format(row.predicted_earnings)}</td>
+                        <td>{number.format(row.predicted_growth)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
     </AppShell>
   );
 }

@@ -372,6 +372,28 @@ button {
   cursor: pointer;
 }
 
+.secondaryButton,
+.ghostButton {
+  color: #1f3f7d;
+  background: #edf4ff;
+  border: 1px solid #cbdcff;
+  box-shadow: none;
+}
+
+.secondaryButton:hover {
+  background: #e2eeff;
+}
+
+.ghostButton {
+  color: #315485;
+  background: transparent;
+  border-color: #c8d8f6;
+}
+
+.ghostButton:hover {
+  background: #f3f7ff;
+}
+
 button:disabled,
 .primaryButton:disabled {
   opacity: 0.6;
@@ -414,6 +436,24 @@ button:disabled,
   font-family: var(--font-heading);
   font-size: 1.16rem;
   line-height: 1;
+}
+
+.batchSummaryLine {
+  margin: 0.9rem 0 0;
+  padding: 0.66rem 0.74rem;
+  border: 1px solid #dae6ff;
+  border-radius: var(--radius-md);
+  background: #f7faff;
+  color: #274579;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.batchTableWrap {
+  margin-top: 1.2rem;
 }
 
 .kpi,
@@ -565,11 +605,98 @@ tr:hover td {
 
 .jsonArea {
   min-height: 240px;
-  margin-top: 0.3rem;
+  margin-top: 0.55rem;
   font-family:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
   font-size: 0.86rem;
+}
+
+.batchInputGrid {
+  margin-top: 0.72rem;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.batchBuilder {
+  display: grid;
+  gap: 0.62rem;
+  padding: 0.74rem;
+  border: 1px solid #d8e4ff;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #f7fbff, #f0f6ff);
+  min-width: 0;
+}
+
+.batchBuilder h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.batchBuilder label {
+  display: grid;
+  gap: 0.34rem;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+
+.batchEditor {
+  padding: 0.74rem;
+  border: 1px solid #d8e4ff;
+  border-radius: var(--radius-md);
+  background: #f9fbff;
+}
+
+.batchEditorHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.batchEditorHeader h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.batchEditorHint {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.batchEditorActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.batchValidation {
+  margin: 0.56rem 0 0;
+  padding: 0.58rem 0.66rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 0.84rem;
+}
+
+.batchValidation.valid {
+  color: #184b95;
+  background: #ecf4ff;
+  border-color: #cfe0ff;
+}
+
+.batchValidation.invalid {
+  color: #8f3329;
+  background: #fff3f1;
+  border-color: #f5d1cc;
 }
 
 .rowActions {
@@ -662,6 +789,14 @@ tr:hover td {
   .batchSummaryGrid {
     grid-template-columns: 1fr;
   }
+
+  .batchInputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .batchEditorActions {
+    width: 100%;
+  }
 }
 
 @media (max-width: 720px) {
@@ -708,6 +843,10 @@ tr:hover td {
 
   .formGrid2 {
     grid-template-columns: 1fr;
+  }
+
+  .batchEditorActions button {
+    flex: 1 1 100%;
   }
 
   .heroPanel,
