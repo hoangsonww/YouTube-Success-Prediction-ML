@@ -1,7 +1,7 @@
 # YouTube Success ML Platform
 
 <p align="center">
-  <img src="images/images.png" alt="Logo" width="60%">
+  <img src="images/images.webp" alt="Logo" width="40%">
 </p>
 
 This repository contains a production-oriented machine learning platform for YouTube channel success prediction and intelligence. The system combines:
