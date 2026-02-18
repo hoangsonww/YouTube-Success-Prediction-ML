@@ -127,7 +127,7 @@ npm run build
 
 ## Deployment
 
-We recommend using Vercel for frontend deployment, as it is the most compatible option with Next and TypeScript. Simply connect your fork of this project to Vercel and use the Vercel dashboard on the web to easily deploy the frontend (remember to select the code directory to be /frontend and use the Next.je preset). 
+We recommend using Vercel for frontend deployment, as it is the most compatible option with Next and TypeScript. Simply connect your fork of this project to Vercel and use the Vercel dashboard on the web to easily deploy the frontend (remember to select the code directory to be /frontend and use the Next.js preset).
 
 > [!TIP]
 > A demo frontend is also available at [https://youtube-success.vercel.app](https://youtube-success.vercel.app). Only the UI demo is available. For it to be fully functional, please set up the backend API and ML serving locally.
