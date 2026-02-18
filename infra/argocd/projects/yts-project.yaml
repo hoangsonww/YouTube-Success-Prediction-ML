@@ -4,7 +4,7 @@ metadata:
   name: youtube-success-ml
   namespace: argocd
 spec:
-  description: Multi-cloud GitOps project for YouTube Success ML platform.
+  description: Multi-cloud GitOps project for YouTube Success Prediction ML platform.
   sourceRepos:
     - "*"
   destinations:

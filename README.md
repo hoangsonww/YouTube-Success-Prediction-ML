@@ -1,7 +1,7 @@
-# YouTube Success ML Platform
+# YouTube Success Prediction ML Platform
 
 <p align="center">
-  <img src="images/images.webp" alt="Logo" width="40%">
+  <img src="images/images.webp" alt="Logo" width="35%">
 </p>
 
 This repository contains a production-oriented machine learning platform for YouTube channel success prediction and intelligence. The system combines:
@@ -692,7 +692,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for:
 
 ```mermaid
 flowchart TD
-    A[YouTube Success ML Platform] --> B[Prediction Engine]
+    A[YouTube Success Prediction ML Platform] --> B[Prediction Engine]
     A --> C[Channel Clustering]
     A --> D[Global Intelligence]
     A --> E[MLOps and Observability]

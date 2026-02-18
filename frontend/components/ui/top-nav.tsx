@@ -24,7 +24,7 @@ export function TopNav() {
       <div className="topbarBrand">
         <span className="brandDot" />
         <div>
-          <strong>YouTube Success ML</strong>
+          <strong>YouTube Success Prediction ML</strong>
           <p>Production Intelligence Suite</p>
         </div>
       </div>

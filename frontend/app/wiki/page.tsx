@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/ui/app-shell";
 
 export const metadata: Metadata = {
-  title: "YouTube Success ML | Project Wiki",
+  title: "YouTube Success Prediction ML | Project Wiki",
   description:
     "Comprehensive project wiki and landing page with architecture charts, MLOps lifecycle, deployment strategy, and operations runbooks.",
   alternates: {
@@ -36,7 +36,7 @@ export default function WikiPage() {
         </div>
         <div className="wikiFrameWrap">
           <iframe
-            title="YouTube Success ML Wiki"
+            title="YouTube Success Prediction ML Wiki"
             src="/wiki/index.html"
             className="wikiFrame"
             loading="lazy"

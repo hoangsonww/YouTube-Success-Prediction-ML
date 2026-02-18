@@ -109,7 +109,7 @@
 
 ## 1. Purpose
 
-This document describes the technical architecture of the YouTube Success ML Platform. It covers:
+This document describes the technical architecture of the YouTube Success Prediction ML Platform. It covers:
 
 - system boundaries
 - runtime components

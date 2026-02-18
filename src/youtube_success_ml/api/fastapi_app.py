@@ -15,7 +15,7 @@ from youtube_success_ml.api.routers import (
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="YouTube Success ML API", version="2.0.0")
+    app = FastAPI(title="YouTube Success Prediction ML API", version="2.0.0")
 
     app.add_middleware(
         CORSMiddleware,

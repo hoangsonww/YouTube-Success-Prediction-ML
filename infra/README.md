@@ -1,6 +1,6 @@
 # Infrastructure Stack
 
-This directory contains the production infrastructure and delivery stack for YouTube Success ML.
+This directory contains the production infrastructure and delivery stack for YouTube Success Prediction ML.
 
 ## Table Of Contents
 

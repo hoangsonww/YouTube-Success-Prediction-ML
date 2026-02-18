@@ -61,7 +61,7 @@ resource "google_artifact_registry_repository" "containers" {
   provider      = google
   location      = var.region
   repository_id = "youtube-success"
-  description   = "Container registry for YouTube Success ML"
+  description   = "Container registry for YouTube Success Prediction ML"
   format        = "DOCKER"
 }
 

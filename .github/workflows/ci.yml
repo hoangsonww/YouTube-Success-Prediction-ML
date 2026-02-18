@@ -1,4 +1,4 @@
-name: 🚀 CI Pipeline - YouTube Success ML
+name: 🚀 CI Pipeline - YouTube Success Prediction ML
 
 on:
   push:
@@ -93,16 +93,82 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  docker_api_ghcr:
+    name: "🐳 API Image → GHCR"
+    runs-on: ubuntu-latest
+    needs: [backend_ml]
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.api
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/youtube-success-ml-api:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/youtube-success-ml-api:latest
+
+  docker_frontend_ghcr:
+    name: "🐳 Frontend Image → GHCR"
+    runs-on: ubuntu-latest
+    needs: [frontend_build, docker_api_ghcr]
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.frontend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/youtube-success-ml-frontend:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/youtube-success-ml-frontend:latest
+
   pipeline_report:
     name: "📊 Pipeline Status Report"
     runs-on: ubuntu-latest
-    needs: [backend_ml, frontend_build]
+    needs: [backend_ml, frontend_build, docker_api_ghcr, docker_frontend_ghcr]
     if: always()
     steps:
       - name: Build workflow summary
         env:
           BACKEND_STATUS: ${{ needs.backend_ml.result }}
           FRONTEND_STATUS: ${{ needs.frontend_build.result }}
+          DOCKER_API_STATUS: ${{ needs.docker_api_ghcr.result }}
+          DOCKER_FRONTEND_STATUS: ${{ needs.docker_frontend_ghcr.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           status_emoji() {
@@ -117,6 +183,8 @@ jobs:
 
           BACKEND_DISPLAY="$(status_emoji "$BACKEND_STATUS")"
           FRONTEND_DISPLAY="$(status_emoji "$FRONTEND_STATUS")"
+          DOCKER_API_DISPLAY="$(status_emoji "$DOCKER_API_STATUS")"
+          DOCKER_FRONTEND_DISPLAY="$(status_emoji "$DOCKER_FRONTEND_STATUS")"
 
           {
             echo "## 📊 CI Pipeline Report"
@@ -125,10 +193,13 @@ jobs:
             echo "| --- | --- |"
             echo "| 🧪 Backend + ML Train/Test | ${BACKEND_DISPLAY} |"
             echo "| 🎨 Frontend Lint + Build | ${FRONTEND_DISPLAY} |"
+            echo "| 🐳 API Image → GHCR | ${DOCKER_API_DISPLAY} |"
+            echo "| 🐳 Frontend Image → GHCR | ${DOCKER_FRONTEND_DISPLAY} |"
             echo ""
             echo "### 📦 Artifacts"
             echo "- \`ml-training-artifacts\` (models, reports, registry, maps)"
             echo "- \`frontend-build-artifacts\` (Next.js build output)"
+            echo "- GHCR images: \`youtube-success-ml-api\`, \`youtube-success-ml-frontend\`"
             echo ""
             echo "Run details: ${RUN_URL}"
           } >> "${GITHUB_STEP_SUMMARY}"
@@ -139,6 +210,8 @@ jobs:
         env:
           BACKEND_STATUS: ${{ needs.backend_ml.result }}
           FRONTEND_STATUS: ${{ needs.frontend_build.result }}
+          DOCKER_API_STATUS: ${{ needs.docker_api_ghcr.result }}
+          DOCKER_FRONTEND_STATUS: ${{ needs.docker_frontend_ghcr.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           script: |
@@ -153,6 +226,8 @@ jobs:
 
             const backend = process.env.BACKEND_STATUS;
             const frontend = process.env.FRONTEND_STATUS;
+            const dockerApi = process.env.DOCKER_API_STATUS;
+            const dockerFrontend = process.env.DOCKER_FRONTEND_STATUS;
             const runUrl = process.env.RUN_URL;
 
             const body = [
@@ -163,10 +238,14 @@ jobs:
               "| --- | --- |",
               `| 🧪 Backend + ML Train/Test | ${statusEmoji(backend)} |`,
               `| 🎨 Frontend Lint + Build | ${statusEmoji(frontend)} |`,
+              `| 🐳 API Image → GHCR | ${statusEmoji(dockerApi)} |`,
+              `| 🐳 Frontend Image → GHCR | ${statusEmoji(dockerFrontend)} |`,
               "",
               "### 📦 Artifacts",
               "- `ml-training-artifacts`",
               "- `frontend-build-artifacts`",
+              "- `ghcr.io/<owner>/youtube-success-ml-api`",
+              "- `ghcr.io/<owner>/youtube-success-ml-frontend`",
               "",
               `[Open workflow run](${runUrl})`,
             ].join("\n");
@@ -202,7 +281,7 @@ jobs:
             }
 
       - name: Enforce overall pipeline success
-        if: ${{ needs.backend_ml.result != 'success' || needs.frontend_build.result != 'success' }}
+        if: ${{ needs.backend_ml.result != 'success' || needs.frontend_build.result != 'success' || !contains(fromJSON('["success","skipped"]'), needs.docker_api_ghcr.result) || !contains(fromJSON('["success","skipped"]'), needs.docker_frontend_ghcr.result) }}
         run: |
           echo "One or more pipeline stages failed."
           exit 1

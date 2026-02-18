@@ -65,7 +65,7 @@ def run_training(run_maps: bool = True) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train YouTube success ML models")
+    parser = argparse.ArgumentParser(description="Train YouTube Success Prediction ML models")
     parser.add_argument(
         "--run-all", action="store_true", help="Train all models and export map assets"
     )
