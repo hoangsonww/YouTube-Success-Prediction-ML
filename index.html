@@ -608,6 +608,24 @@ flowchart TB
   READY --> FLOW
             </pre>
           </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="mlops governance approval policy gate rollback audit"
+          >
+            <h3>Model Governance Gate</h3>
+            <pre class="mermaid">
+flowchart TD
+  CANDIDATE[Candidate run] --> QUALITY[Quality checks]
+  QUALITY --> DRIFT[Baseline drift tolerance]
+  DRIFT --> POLICY[Policy review]
+  POLICY --> APPROVE{Approved?}
+  APPROVE -- yes --> PROMOTE[Set active_run_id]
+  APPROVE -- no --> HOLD[Keep previous stable run]
+  PROMOTE --> AUDIT[Append governance record]
+  HOLD --> AUDIT
+            </pre>
+          </article>
         </div>
       </section>
 
@@ -718,6 +736,27 @@ flowchart TB
   GCPLANE --> GCPC["GKE workload rollout"]
   AZLANE --> AZC["AKS workload rollout"]
   OCILANE --> OCIC["OKE workload rollout"]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="gitops promotion rings staging production rollback health"
+          >
+            <h3>GitOps Promotion Rings</h3>
+            <pre class="mermaid">
+flowchart LR
+  BUILD[Verified build] --> DEV[Dev ring]
+  DEV --> QA[QA ring]
+  QA --> PREPROD[Preprod ring]
+  PREPROD --> PROD[Production ring]
+  DEV --> HEALTH1[Health gate]
+  QA --> HEALTH2[Soak gate]
+  PREPROD --> HEALTH3[Approval gate]
+  HEALTH1 --> QA
+  HEALTH2 --> PREPROD
+  HEALTH3 --> PROD
+  PROD --> ROLLBACK[Instant rollback to prior revision]
             </pre>
           </article>
         </div>
