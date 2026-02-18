@@ -16,6 +16,7 @@
 ![pytest](https://img.shields.io/badge/pytest-Testing-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
 ![HTTPX](https://img.shields.io/badge/HTTPX-API%20Testing-5B21B6?style=for-the-badge)
 ![Ruff](https://img.shields.io/badge/Ruff-Lint%20%26%20Format-D7FF64?style=for-the-badge&logo=ruff&logoColor=111111)
+![Black + iSort](https://img.shields.io/badge/Black%20%2B%20iSort-Formatting-000000?style=for-the-badge&logo=black&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-5FA04E?style=for-the-badge&logo=node.js&logoColor=white)
 ![npm](https://img.shields.io/badge/npm-Package%20Manager-CB3837?style=for-the-badge&logo=npm&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=for-the-badge&logo=next.js&logoColor=white)
