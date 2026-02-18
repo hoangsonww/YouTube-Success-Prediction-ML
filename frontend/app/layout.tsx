@@ -20,8 +20,8 @@ export const metadata: Metadata = {
     "MLOps",
     "growth forecasting",
   ],
-  authors: [{ name: "YouTube Success Prediction ML Team" }],
-  creator: "YouTube Success Prediction ML Team",
+  authors: [{ name: "Son Nguyen" }],
+  creator: "Son Nguyen",
   publisher: "YouTube Success Prediction ML",
   formatDetection: {
     email: false,
