@@ -96,7 +96,7 @@ jobs:
   docker_api_ghcr:
     name: "🐳 API Image → GHCR"
     runs-on: ubuntu-latest
-    needs: [backend_ml]
+    needs: [backend_ml, frontend_build]
     if: github.event_name != 'pull_request'
     permissions:
       contents: read
@@ -128,7 +128,7 @@ jobs:
   docker_frontend_ghcr:
     name: "🐳 Frontend Image → GHCR"
     runs-on: ubuntu-latest
-    needs: [frontend_build, docker_api_ghcr]
+    needs: [backend_ml, frontend_build]
     if: github.event_name != 'pull_request'
     permissions:
       contents: read
