@@ -147,10 +147,11 @@ a {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.92rem;
   padding-left: 0.3rem;
   font-family: "Space Grotesk", sans-serif;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 .brand-dot {
@@ -338,6 +339,9 @@ a {
 .metric-card h3 {
   font-size: 2rem;
   color: #f6f9ff;
+  transition:
+    color 0.35s ease,
+    text-shadow 0.45s ease;
 }
 
 .metric-card p {
@@ -347,23 +351,29 @@ a {
 }
 
 .metrics-grid .metric-card.in-view {
-  animation: metric-pop 0.58s ease both;
+  animation: metric-pop 0.86s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
 }
 
 .metrics-grid .metric-card.in-view:nth-child(1) {
-  animation-delay: 0.12s;
+  animation-delay: 0.14s;
 }
 
 .metrics-grid .metric-card.in-view:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.24s;
 }
 
 .metrics-grid .metric-card.in-view:nth-child(3) {
-  animation-delay: 0.28s;
+  animation-delay: 0.34s;
 }
 
 .metrics-grid .metric-card.in-view:nth-child(4) {
-  animation-delay: 0.36s;
+  animation-delay: 0.44s;
+}
+
+.metric-card h3.count-complete {
+  color: #ffffff;
+  text-shadow: 0 0 22px rgba(107, 170, 255, 0.32);
 }
 
 .section {
@@ -376,6 +386,13 @@ a {
 
 .section-head h2 {
   font-size: clamp(1.45rem, 2.9vw, 2.2rem);
+}
+
+.section-copy {
+  margin-top: 0.6rem;
+  max-width: 78ch;
+  color: var(--text-dim);
+  line-height: 1.62;
 }
 
 .feature-grid,
@@ -666,11 +683,23 @@ a {
 @keyframes metric-pop {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.985);
+    transform: translateY(16px) scale(0.965);
+    filter: blur(2px);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metrics-grid .metric-card.in-view {
+    animation: none;
+  }
+
+  .metric-card h3.count-complete {
+    text-shadow: none;
   }
 }
 
@@ -764,7 +793,8 @@ a {
 
   .brand {
     min-width: 0;
-    padding-left: 0.45rem;
+    gap: 0.8rem;
+    padding-left: 0.52rem;
   }
 
   .brand span:last-child {
@@ -773,6 +803,7 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 0.95rem;
+    font-weight: 800;
   }
 
   .feature-card,

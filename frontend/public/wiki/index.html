@@ -9,9 +9,18 @@
       content="Production-grade YouTube Success Prediction ML platform wiki: prediction, clustering, visualization, MLOps, and multi-cloud deployment architecture."
     />
     <meta name="theme-color" content="#0d1321" />
+    <link
+      rel="canonical"
+      href="https://hoangsonww.github.io/YouTube-Success-Prediction-ML/index.html"
+    />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml" />
     <link rel="icon" href="frontend/public/favicon.ico" />
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <meta
+      name="keywords"
+      content="YouTube success prediction, machine learning platform, MLOps, multi-cloud deployment, API design, frontend architecture, data pipeline, model governance"
+    />
   </head>
   <body>
     <div class="bg-orb orb-a"></div>
@@ -149,6 +158,16 @@
         <div class="section-head">
           <p class="kicker">System Design</p>
           <h2>Architecture Views</h2>
+          <p class="section-copy">
+            These views describe how the platform is separated into product-facing interfaces,
+            inference services, and lifecycle infrastructure so teams can evolve each area without
+            coupling failures across the system.
+          </p>
+          <p class="section-copy">
+            The diagrams below should be read together: component topology explains ownership,
+            pipeline flow explains data contracts, and lifecycle/observability views define runtime
+            guardrails for production traffic.
+          </p>
         </div>
         <div class="chart-grid">
           <article
@@ -266,6 +285,15 @@ flowchart LR
         <div class="section-head">
           <p class="kicker">Quality, Governance, Reliability</p>
           <h2>MLOps Lifecycle</h2>
+          <p class="section-copy">
+            MLOps here is treated as an operational control plane, not only a training script. Every
+            run produces lineage metadata, quality reports, and promotion context that can be
+            audited before a model becomes active.
+          </p>
+          <p class="section-copy">
+            The lifecycle charts map how drift checks, readiness gates, rollback paths, and registry
+            state interact to keep inference stable while still allowing frequent model refreshes.
+          </p>
         </div>
         <div class="chart-grid">
           <article
@@ -368,6 +396,15 @@ flowchart LR
         <div class="section-head">
           <p class="kicker">Production Delivery</p>
           <h2>Multi-Cloud CI/CD and GitOps</h2>
+          <p class="section-copy">
+            Delivery is designed as a single workflow model with provider-specific execution lanes.
+            CI verifies build quality and artifact integrity once, then GitOps drives reconciled
+            rollout behavior across AWS, GCP, Azure, and OCI.
+          </p>
+          <p class="section-copy">
+            Strategy overlays let operators switch between rolling, canary, and blue/green without
+            changing app code. This keeps release mechanics explicit, reviewable, and reversible.
+          </p>
         </div>
         <div class="chart-grid">
           <article
@@ -519,6 +556,15 @@ flowchart TB
         <div class="section-head">
           <p class="kicker">Operator Toolkit</p>
           <h2>Command Center</h2>
+          <p class="section-copy">
+            This command catalog is structured by execution intent: local validation, frontend
+            quality checks, Kubernetes rendering, GitOps strategy control, and infrastructure
+            provisioning.
+          </p>
+          <p class="section-copy">
+            Use it as the fast path for repeatable operations. Each block is copy-ready and maps to
+            a production concern so on-call and delivery teams can execute with low ambiguity.
+          </p>
         </div>
         <div class="runbook-grid">
           <article class="runbook-card reveal searchable" data-search="local bootstrap train test">
@@ -674,6 +720,15 @@ terraform apply</code></pre>
         <div class="section-head">
           <p class="kicker">Execution Playbook</p>
           <h2>Operator Runbook</h2>
+          <p class="section-copy">
+            The runbook captures high-signal commands used during validation, incident handling, and
+            controlled rollout. It complements CI/CD by giving humans deterministic break-glass and
+            verification steps.
+          </p>
+          <p class="section-copy">
+            In production operations, prioritize this sequence: verify readiness, run smoke checks,
+            confirm deployment parameters, and only then escalate to abort/undo actions.
+          </p>
         </div>
         <div class="runbook-grid">
           <article class="runbook-card reveal searchable" data-search="smoke api verify">

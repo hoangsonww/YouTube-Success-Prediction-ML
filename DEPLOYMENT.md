@@ -104,6 +104,9 @@ Ingress model:
 - `https://youtube-success.example.com` -> frontend service.
 - `https://api.youtube-success.example.com` -> FastAPI service.
 
+> [!NOTE]
+> These endpoints are configurable via `Ingress` host rules and environment variables in the deployment manifests. Update them to match your actual domain configuration.
+
 ### Strategy Overlays (`infra/k8s/overlays`)
 
 - `rolling`: native Kubernetes rolling updates.
