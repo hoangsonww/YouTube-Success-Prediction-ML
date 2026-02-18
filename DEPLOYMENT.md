@@ -25,6 +25,7 @@ This project ships a full multi-cloud deployment stack with:
 - [10) Required Cluster Add-ons](#10-required-cluster-add-ons)
 - [11) Production Readiness Checklist](#11-production-readiness-checklist)
 - [12) Deployment Modes Summary](#12-deployment-modes-summary)
+- [13) Frontend Deployment](#13-frontend-deployment)
 
 ## Document Metadata
 
