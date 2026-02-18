@@ -302,6 +302,7 @@ The platform is built with the following technologies, chosen for their producti
 
 - `Next.js 14`
 - `TypeScript`
+- Vercel
 
 ### DevOps / Delivery
 
@@ -314,6 +315,7 @@ The platform is built with the following technologies, chosen for their producti
 - Argo CD + Argo Rollouts (`infra/argocd`, `infra/k8s/overlays`)
 - Terraform multi-cloud packs (`infra/terraform`)
 - Kubernetes Kustomize overlays (`infra/k8s`)
+- AWS, Azure, OCI, and GCP support
 
 ### GitHub Actions CI/CD
 
