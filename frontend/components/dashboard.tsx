@@ -3,7 +3,12 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/ui/app-shell";
-import { getClusterSummary, getCountryMetrics, predict } from "@/lib/api";
+import {
+  getClusterSummary,
+  getCountryMetrics,
+  isOfflineFallbackModeEnabled,
+  predict,
+} from "@/lib/api";
 import type { ClusterRecord, CountryMetricRecord, PredictionResult } from "@/lib/types";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -26,14 +31,18 @@ export function Dashboard() {
   const [clusters, setClusters] = useState<ClusterRecord[]>([]);
   const [countries, setCountries] = useState<CountryMetricRecord[]>([]);
   const [dataError, setDataError] = useState<string | null>(null);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
     Promise.all([getClusterSummary(), getCountryMetrics()])
       .then(([clusterRows, countryRows]) => {
         setClusters(clusterRows);
         setCountries(countryRows);
+        setOfflineMode(isOfflineFallbackModeEnabled());
       })
-      .catch((err: Error) => setDataError(err.message));
+      .catch((err: Error) => setDataError(err.message))
+      .finally(() => setDataLoading(false));
   }, []);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -44,6 +53,7 @@ export function Dashboard() {
     try {
       const result = await predict({ uploads, category, country, age });
       setPrediction(result);
+      setOfflineMode(isOfflineFallbackModeEnabled());
     } catch (err) {
       setPredictionError(err instanceof Error ? err.message : "Prediction failed");
     } finally {
@@ -64,20 +74,40 @@ export function Dashboard() {
         { href: "/intelligence/lab", label: "Open Intelligence Lab", tone: "secondary" },
       ]}
     >
+      {offlineMode && (
+        <div className="demoNotice">
+          Demo mode is active because the backend API is unreachable. The UI is showing placeholder
+          data and local fallback predictions only. Start the backend and point
+          `NEXT_PUBLIC_API_BASE_URL` to it for full functionality.
+        </div>
+      )}
+
       <section className="panelGrid panelGrid3">
         <article className="panel statPanel">
           <p className="statLabel">Tracked Countries</p>
-          <strong className="statValue">{number.format(countries.length)}</strong>
+          {dataLoading ? (
+            <span className="skeletonText skeletonLg" aria-hidden="true" />
+          ) : (
+            <strong className="statValue">{number.format(countries.length)}</strong>
+          )}
           <p className="statMeta">Global footprint covered by analytics.</p>
         </article>
         <article className="panel statPanel">
           <p className="statLabel">Cluster Archetypes</p>
-          <strong className="statValue">{number.format(clusters.length)}</strong>
+          {dataLoading ? (
+            <span className="skeletonText skeletonLg" aria-hidden="true" />
+          ) : (
+            <strong className="statValue">{number.format(clusters.length)}</strong>
+          )}
           <p className="statMeta">Including KMeans + DBSCAN segmentation.</p>
         </article>
         <article className="panel statPanel">
           <p className="statLabel">Dominant Archetype</p>
-          <strong className="statValue small">{leadingCluster?.archetype ?? "Loading"}</strong>
+          {dataLoading ? (
+            <span className="skeletonText skeletonMd" aria-hidden="true" />
+          ) : (
+            <strong className="statValue small">{leadingCluster?.archetype ?? "Unavailable"}</strong>
+          )}
           <p className="statMeta">Largest current channel behavior segment.</p>
         </article>
       </section>
@@ -169,15 +199,23 @@ export function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {clusters.map((row) => (
-                    <tr key={row.cluster_id}>
-                      <td>{row.cluster_id}</td>
-                      <td>{row.archetype}</td>
-                      <td>{number.format(row.size)}</td>
-                      <td>{number.format(row.avg_growth)}</td>
-                      <td>{row.dominant_category}</td>
-                    </tr>
-                  ))}
+                  {dataLoading
+                    ? Array.from({ length: 4 }).map((_, idx) => (
+                        <tr key={`cluster-skeleton-${idx}`}>
+                          <td colSpan={5}>
+                            <div className="skeletonRow" />
+                          </td>
+                        </tr>
+                      ))
+                    : clusters.map((row) => (
+                        <tr key={row.cluster_id}>
+                          <td>{row.cluster_id}</td>
+                          <td>{row.archetype}</td>
+                          <td>{number.format(row.size)}</td>
+                          <td>{number.format(row.avg_growth)}</td>
+                          <td>{row.dominant_category}</td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </div>
@@ -202,14 +240,22 @@ export function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {topCountries.map((row) => (
-                <tr key={row.country}>
-                  <td>{row.country}</td>
-                  <td>{number.format(row.total_subscribers)}</td>
-                  <td>{currency.format(row.total_earnings)}</td>
-                  <td>{row.dominant_category}</td>
-                </tr>
-              ))}
+              {dataLoading
+                ? Array.from({ length: 6 }).map((_, idx) => (
+                    <tr key={`country-skeleton-${idx}`}>
+                      <td colSpan={4}>
+                        <div className="skeletonRow" />
+                      </td>
+                    </tr>
+                  ))
+                : topCountries.map((row) => (
+                    <tr key={row.country}>
+                      <td>{row.country}</td>
+                      <td>{number.format(row.total_subscribers)}</td>
+                      <td>{currency.format(row.total_earnings)}</td>
+                      <td>{row.dominant_category}</td>
+                    </tr>
+                  ))}
             </tbody>
           </table>
         </div>
