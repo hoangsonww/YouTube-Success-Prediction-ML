@@ -428,3 +428,7 @@ flowchart TB
 ```
 
 For local development and testing, `docker compose` provides a quick way to run the full stack. For production deployments, the Jenkins pipeline orchestrates image building, cloud provisioning (optional), and Argo CD synchronization with the selected rollout strategy. The Terraform packs allow for flexible multi-cloud infrastructure management aligned with the deployment process.
+
+## 13) Frontend Deployment
+
+We recommend deploying frontend on Vercel due to convenience and ease of deployment. FYI, a demo frontend is available on Vercel at: [https://youtube-success.vercel.app](https://youtube-success.vercel.app). However, backend functionalities are not connected. Please run the backend API and AI/ML functionalities to enjoy all features of the platform.
