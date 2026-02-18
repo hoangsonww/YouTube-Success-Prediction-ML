@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use YouTube Success ML in your work, please cite this software."
-title: "YouTube Success ML: Prediction, Clustering, and Global Intelligence Platform"
+message: "If you use YouTube Success Prediction ML in your work, please cite this software."
+title: "YouTube Success Prediction ML: Prediction, Clustering, and Global Intelligence Platform"
 type: software
 version: "0.1.0"
 date-released: "2026-02-18"
@@ -8,7 +8,7 @@ authors:
   - family-names: "Nguyen"
     given-names: "David"
 abstract: |
-  YouTube Success ML is a production-oriented machine learning platform for
+  YouTube Success Prediction ML is a production-oriented machine learning platform for
   YouTube channel intelligence. It combines supervised prediction for subscribers,
   earnings, and growth, unsupervised channel clustering with KMeans/DBSCAN, and
   global country/category analytics with map-ready outputs. The platform includes

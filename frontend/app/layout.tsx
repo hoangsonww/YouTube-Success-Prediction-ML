@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://hoangsonww.github.io/YouTube-Success-Prediction-ML"),
   manifest: "/manifest.json",
   title: {
-    default: "YouTube Success ML",
+    default: "YouTube Success Prediction ML",
     template: "%s",
   },
   description:
     "Production-grade YouTube intelligence platform for channel outcome prediction, clustering, explainability, and global analytics.",
-  applicationName: "YouTube Success ML",
+  applicationName: "YouTube Success Prediction ML",
   keywords: [
     "YouTube analytics",
     "machine learning",
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     "MLOps",
     "growth forecasting",
   ],
-  authors: [{ name: "YouTube Success ML Team" }],
-  creator: "YouTube Success ML Team",
-  publisher: "YouTube Success ML",
+  authors: [{ name: "YouTube Success Prediction ML Team" }],
+  creator: "YouTube Success Prediction ML Team",
+  publisher: "YouTube Success Prediction ML",
   formatDetection: {
     email: false,
     address: false,
@@ -40,17 +40,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: "YouTube Success ML",
+    title: "YouTube Success Prediction ML",
     description:
       "Predict subscribers, earnings, and growth. Explore clustering archetypes and global YouTube intelligence.",
-    siteName: "YouTube Success ML",
+    siteName: "YouTube Success Prediction ML",
     images: [
-      { url: "/android-chrome-512x512.png", width: 512, height: 512, alt: "YouTube Success ML" },
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "YouTube Success Prediction ML",
+      },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "YouTube Success ML",
+    title: "YouTube Success Prediction ML",
     description:
       "Production intelligence dashboard for YouTube success prediction, clustering, and advanced analytics.",
     images: ["/android-chrome-512x512.png"],

@@ -564,8 +564,8 @@ export function IntelligenceLabClient() {
         </div>
 
         <p className="mutedText">
-          Build payloads with the guided form, then validate and run one-click inference on the
-          full batch.
+          Build payloads with the guided form, then validate and run one-click inference on the full
+          batch.
         </p>
 
         <section className="batchInputGrid">

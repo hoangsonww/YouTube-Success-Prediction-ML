@@ -54,6 +54,9 @@
 - [7. Data Flow: Training Lifecycle](#7-data-flow-training-lifecycle)
 - [8. Data Flow: Inference Request Lifecycle](#8-data-flow-inference-request-lifecycle)
 - [9. Data Layer And Feature Engineering](#9-data-layer-and-feature-engineering)
+- [9.1 Dataset Overview](#91-dataset-overview)
+- [9.2 Canonical Transformation Rules](#92-canonical-transformation-rules)
+- [9.3 Raw vs Processed Contracts](#93-raw-vs-processed-contracts)
 - [10. Modeling Architecture](#10-modeling-architecture)
 - [11. API Design](#11-api-design)
 - [12. Frontend Architecture](#12-frontend-architecture)
@@ -109,7 +112,7 @@
 
 ## 1. Purpose
 
-This document describes the technical architecture of the YouTube Success ML Platform. It covers:
+This document describes the technical architecture of the YouTube Success Prediction ML Platform. It covers:
 
 - system boundaries
 - runtime components
@@ -292,12 +295,39 @@ sequenceDiagram
 
 ## 9. Data Layer And Feature Engineering
 
-### Source
+### 9.1 Dataset Overview
 
-- Dataset path: `data/Global YouTube Statistics.csv`
-- Encoding: `latin-1`
+Primary source dataset:
 
-### Canonical Transformation Rules
+- path resolution: `resolve_data_path()` in `src/youtube_success_ml/data/loader.py`
+- default source file: `data/Global YouTube Statistics.csv`
+- optional override: `YTS_DATA_PATH`
+- encoding: `latin-1`
+- row count: `995`
+- raw column count: `28`
+
+Processed training frame:
+
+- row count: `995`
+- processed column count: `30`
+- engineered columns include `age` and `growth_target`
+
+Dataset domains:
+
+| Domain | Examples |
+| --- | --- |
+| Channel identity and taxonomy | `youtuber`, `title`, `channel_type`, `category`, `country`, `abbreviation` |
+| Core performance | `uploads`, `subscribers`, `video_views`, `video_views_for_the_last_30_days` |
+| Monetization | `lowest_monthly_earnings`, `highest_monthly_earnings`, `lowest_yearly_earnings`, `highest_yearly_earnings` |
+| Growth and lifecycle | `subscribers_for_last_30_days`, `created_year`, `created_month`, `created_date`, engineered `age`, engineered `growth_target` |
+| Geo and socio-economic context | `latitude`, `longitude`, `population`, `urban_population`, `unemployment_rate`, `gross_tertiary_education_enrollment_pct` |
+
+Feature/target contract for supervised inference:
+
+- features: `uploads`, `category`, `country`, `age`
+- targets: `subscribers`, `highest_yearly_earnings`, `growth_target`
+
+### 9.2 Canonical Transformation Rules
 
 Defined in `src/youtube_success_ml/data/loader.py`:
 
@@ -308,7 +338,7 @@ Defined in `src/youtube_success_ml/data/loader.py`:
 - derive `growth_target = subscribers_for_last_30_days`.
 - enforce non-negative clipping for key numeric targets.
 
-### Raw vs Processed Contracts
+### 9.3 Raw vs Processed Contracts
 
 - raw contract endpoint: `/data/raw-sample`
 - processed contract endpoint: `/data/processed-sample`
@@ -550,6 +580,10 @@ Pipeline responsibilities:
   - Argo CD sync and optional blue/green promotion gate
 
 This split keeps PR quality checks fast while preserving production-grade release controls.
+
+<p align="center">
+  <img src="images/gh.png" alt="GitHub Actions Workflow" width="100%">
+</p>
 
 ## 19. Capacity And Scalability Notes
 

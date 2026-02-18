@@ -1,4 +1,21 @@
-# YouTube Success ML Platform
+# YouTube Success Prediction ML Platform
+
+<p align="center">
+  <img src="images/images.webp" alt="Logo" width="35%">
+</p>
+
+This repository contains a production-oriented machine learning platform for YouTube channel success prediction and intelligence. The system combines:
+
+1. Supervised prediction of channel outcomes.
+2. Unsupervised channel archetype discovery.
+3. Global analytics and map-ready country/category intelligence.
+4. Production API and frontend delivery with MLOps artifacts.
+5. Multi-cloud deployment and GitOps strategy.
+6. Comprehensive documentation and operational runbooks.
+7. Quality gates, testing, and formatting for maintainability.
+8. Detailed design and architecture documentation for engineering alignment.
+
+This `README.md` is only the operational entrypoint. For detailed design and subsystem contracts, use the linked documentation map below.
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-Data%20Processing-150458?style=for-the-badge&logo=pandas&logoColor=white)
@@ -41,24 +58,12 @@
 ![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Diagrams-FF3670?style=for-the-badge&logo=mermaid&logoColor=white)
 
-This repository contains a production-oriented machine learning platform for YouTube channel success prediction and intelligence. The system combines:
-
-1. Supervised prediction of channel outcomes.
-2. Unsupervised channel archetype discovery.
-3. Global analytics and map-ready country/category intelligence.
-4. Production API and frontend delivery with MLOps artifacts.
-5. Multi-cloud deployment and GitOps strategy.
-6. Comprehensive documentation and operational runbooks.
-7. Quality gates, testing, and formatting for maintainability.
-8. Detailed design and architecture documentation for engineering alignment.
-
-This `README.md` is only the operational entrypoint. For detailed design and subsystem contracts, use the linked documentation map below.
-
 ## Table Of Contents
 
 - [Document Metadata](#document-metadata)
 - [Documentation Map](#documentation-map)
 - [Project Overview](#project-overview)
+- [Dataset Overview](#dataset-overview)
 - [Implemented Capabilities](#implemented-capabilities)
 - [Technology Stack](#technology-stack)
 - [Repository Layout](#repository-layout)
@@ -123,6 +128,53 @@ and returns:
 - predicted 30-day growth
 
 It also clusters channels into strategic archetypes and produces country-level influence/earnings/category metrics for data storytelling and product UI consumption.
+
+### Dataset Overview
+
+Primary dataset:
+
+- file: `data/Global YouTube Statistics.csv`
+- encoding: `latin-1`
+- rows: `995`
+- columns: `28` (raw source schema)
+
+Processed dataset artifact:
+
+- file: `data/global_youtube_statistics_processed.csv`
+- rows: `995`
+- columns: `30` (includes engineered `age` and `growth_target`)
+
+Model input contract used by prediction APIs:
+
+- `uploads` (numeric)
+- `category` (categorical)
+- `country` (categorical)
+- `age` (numeric)
+
+Model targets:
+
+- `subscribers`
+- `highest_yearly_earnings`
+- `growth_target` (derived from `subscribers_for_last_30_days`)
+
+Key preprocessing and cleaning behavior (implemented in `src/youtube_success_ml/data/loader.py`):
+
+- normalizes raw headers to snake_case
+- coerces known numeric fields (`errors="coerce"`)
+- imputes/fills categorical nulls (`country`, `category`, `abbreviation`)
+- derives `age` from `created_year` with non-negative clipping
+- derives `growth_target` from 30-day subscriber change
+- clips critical numeric features/targets to non-negative values
+
+High-signal source columns represented in the dataset:
+
+| Group | Columns |
+| --- | --- |
+| Identity and taxonomy | `rank`, `youtuber`, `title`, `channel_type`, `category`, `country`, `abbreviation` |
+| Core performance | `uploads`, `subscribers`, `video_views`, `video_views_for_the_last_30_days` |
+| Earnings | `lowest_monthly_earnings`, `highest_monthly_earnings`, `lowest_yearly_earnings`, `highest_yearly_earnings` |
+| Growth and lifecycle | `subscribers_for_last_30_days`, `created_year`, `created_month`, `created_date`, engineered `age`, engineered `growth_target` |
+| Geo and socio-economic context | `latitude`, `longitude`, `population`, `urban_population`, `unemployment_rate`, `gross_tertiary_education_enrollment_pct` |
 
 ## Implemented Capabilities
 
@@ -259,6 +311,60 @@ The platform is built with the following technologies, chosen for their producti
 - Argo CD + Argo Rollouts (`infra/argocd`, `infra/k8s/overlays`)
 - Terraform multi-cloud packs (`infra/terraform`)
 - Kubernetes Kustomize overlays (`infra/k8s`)
+
+### GitHub Actions CI/CD
+
+Primary workflow: `.github/workflows/ci.yml`
+
+Pipeline stages and behavior:
+
+1. `🧪 Backend + ML Train/Test`
+- installs Python dependencies
+- runs full training (`python -m youtube_success_ml.train --run-all`)
+- runs test suite (`pytest -q`)
+- uploads ML artifacts (`artifacts/**`)
+- enforces stable data/artifact paths with:
+  - `YTS_PROJECT_ROOT`
+  - `YTS_DATA_PATH`
+  - `YTS_ARTIFACT_DIR`
+
+2. `🎨 Frontend Lint + Build`
+- installs frontend dependencies (`npm ci`)
+- runs lint and production build
+- uploads frontend build artifacts
+
+3. `🐳 API Image -> GHCR` and `🐳 Frontend Image -> GHCR`
+- both jobs wait for backend and frontend quality gates to complete
+- both jobs then run in parallel
+- images are pushed to:
+  - `ghcr.io/<owner>/youtube-success-ml-api:<sha>`
+  - `ghcr.io/<owner>/youtube-success-ml-api:latest`
+  - `ghcr.io/<owner>/youtube-success-ml-frontend:<sha>`
+  - `ghcr.io/<owner>/youtube-success-ml-frontend:latest`
+- GHCR publish runs on non-PR events (`push`, `workflow_dispatch`); PR runs skip publish safely
+
+4. `📊 Pipeline Status Report`
+- generates GitHub job summary
+- posts/updates PR comment with stage statuses
+- enforces overall pipeline success (while allowing skipped GHCR jobs on PRs)
+
+Minimal execution graph:
+
+```mermaid
+flowchart LR
+  A[Backend + ML Train/Test] --> C[API Image -> GHCR]
+  B[Frontend Lint + Build] --> C
+  A --> D[Frontend Image -> GHCR]
+  B --> D
+  A --> E[Pipeline Status Report]
+  B --> E
+  C --> E
+  D --> E
+```
+
+<p align="center">
+  <img src="images/gh.png" alt="GitHub Actions Workflow" width="100%">
+</p>
 
 ## Repository Layout
 
@@ -688,7 +794,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for:
 
 ```mermaid
 flowchart TD
-    A[YouTube Success ML Platform] --> B[Prediction Engine]
+    A[YouTube Success Prediction ML Platform] --> B[Prediction Engine]
     A --> C[Channel Clustering]
     A --> D[Global Intelligence]
     A --> E[MLOps and Observability]

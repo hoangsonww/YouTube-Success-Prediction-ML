@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "YouTube Success ML",
+    name: "YouTube Success Prediction ML",
     short_name: "YT Success ML",
     description: "Production-grade YouTube intelligence platform.",
     start_url: "/",

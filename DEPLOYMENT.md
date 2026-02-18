@@ -5,6 +5,7 @@ This project ships a full multi-cloud deployment stack with:
 - Kubernetes base runtime manifests.
 - Argo CD GitOps applications.
 - Argo Rollouts strategies (`rolling`, `canary`, `bluegreen`).
+- GitHub Actions CI/CD pipeline for train/test/build/report + GHCR publishing.
 - Jenkins CI/CD pipeline with image build/push + infra orchestration.
 - Terraform cloud packs for AWS, GCP, Azure, and OCI.
 
@@ -18,11 +19,12 @@ This project ships a full multi-cloud deployment stack with:
 - [4) Rollout Strategies](#4-rollout-strategies)
 - [5) Argo CD GitOps](#5-argo-cd-gitops)
 - [6) Jenkins Pipeline](#6-jenkins-pipeline)
-- [7) Multi-Cloud Terraform Packs](#7-multi-cloud-terraform-packs)
-- [8) Docker Integration](#8-docker-integration)
-- [9) Required Cluster Add-ons](#9-required-cluster-add-ons)
-- [10) Production Readiness Checklist](#10-production-readiness-checklist)
-- [11) Deployment Modes Summary](#11-deployment-modes-summary)
+- [7) GitHub Actions CI/CD](#7-github-actions-cicd)
+- [8) Multi-Cloud Terraform Packs](#8-multi-cloud-terraform-packs)
+- [9) Docker Integration](#9-docker-integration)
+- [10) Required Cluster Add-ons](#10-required-cluster-add-ons)
+- [11) Production Readiness Checklist](#11-production-readiness-checklist)
+- [12) Deployment Modes Summary](#12-deployment-modes-summary)
 
 ## Document Metadata
 
@@ -31,7 +33,7 @@ This project ships a full multi-cloud deployment stack with:
 | Document role | Deployment and release operations runbook |
 | Primary audience | Platform engineers, DevOps engineers, release managers |
 | Last updated | February 18, 2026 |
-| Delivery stack | Jenkins + Argo CD + Argo Rollouts + Kubernetes + Terraform |
+| Delivery stack | GitHub Actions + Jenkins + Argo CD + Argo Rollouts + Kubernetes + Terraform |
 | Runtime scope | Local Docker and multi-cloud Kubernetes production |
 
 ## Documentation Map
@@ -253,7 +255,61 @@ OCI:
 - `OCI_AUTH_TOKEN`
 - OCI API credentials for OKE/Object Storage/Terraform
 
-## 7) Multi-Cloud Terraform Packs
+## 7) GitHub Actions CI/CD
+
+Workflow file: `.github/workflows/ci.yml`
+
+Purpose:
+
+- enforce backend ML quality gates and frontend quality gates
+- publish Docker images to GHCR from the same Dockerfiles used by production
+- provide workflow and PR-level pipeline status reporting
+
+Job topology:
+
+1. `🧪 Backend + ML Train/Test`
+- installs Python dependencies
+- runs training (`python -m youtube_success_ml.train --run-all`)
+- runs tests (`pytest -q`)
+- uploads ML artifacts
+- sets:
+  - `YTS_PROJECT_ROOT=${{ github.workspace }}`
+  - `YTS_DATA_PATH=${{ github.workspace }}/data/Global YouTube Statistics.csv`
+  - `YTS_ARTIFACT_DIR=${{ github.workspace }}/artifacts`
+
+2. `🎨 Frontend Lint + Build`
+- runs `npm ci`, `npm run lint`, `npm run build`
+- uploads frontend build artifacts
+
+3. `🐳 API Image -> GHCR` and `🐳 Frontend Image -> GHCR`
+- both depend on backend and frontend stages
+- both execute in parallel once quality gates pass
+- both log in with `docker/login-action` and `GITHUB_TOKEN`
+- both publish `sha` and `latest` tags to GHCR
+- publish is skipped for pull requests (runs on `push`/`workflow_dispatch`)
+
+4. `📊 Pipeline Status Report`
+- writes GitHub job summary
+- comments PR status (update-in-place)
+- enforces final workflow success
+
+```mermaid
+flowchart LR
+    A[Backend + ML Train/Test] --> C[API Image -> GHCR]
+    B[Frontend Lint + Build] --> C
+    A --> D[Frontend Image -> GHCR]
+    B --> D
+    A --> E[Pipeline Status Report]
+    B --> E
+    C --> E
+    D --> E
+```
+
+<p align="center">
+  <img src="images/gh.png" alt="GitHub Actions Workflow" width="100%">
+</p>
+
+## 8) Multi-Cloud Terraform Packs
 
 Each cloud has a root environment in `infra/terraform/environments/<cloud>` and a provider module in `infra/terraform/modules/<provider>_platform`.
 
@@ -309,7 +365,7 @@ terraform init
 terraform plan
 ```
 
-## 8) Docker Integration
+## 9) Docker Integration
 
 Existing Docker setup remains first-class and is the source for production images:
 
@@ -317,9 +373,9 @@ Existing Docker setup remains first-class and is the source for production image
 - Frontend: `docker/Dockerfile.frontend`
 - Local full stack: `docker-compose.yml`
 
-Jenkins uses the same Dockerfiles for CI image publishing.
+Jenkins and GitHub Actions both use the same Dockerfiles for image publishing.
 
-## 9) Required Cluster Add-ons
+## 10) Required Cluster Add-ons
 
 Install before canary/bluegreen production rollout:
 
@@ -328,7 +384,7 @@ Install before canary/bluegreen production rollout:
 - Argo Rollouts controller + kubectl plugin.
 - Metrics server (for HPA).
 
-## 10) Production Readiness Checklist
+## 11) Production Readiness Checklist
 
 1. Terraform state backend configured (no placeholder values).
 2. Registry auth and push permissions validated.
@@ -339,7 +395,7 @@ Install before canary/bluegreen production rollout:
 7. Blue/green manual promotion runbook validated.
 8. Rollback command tested in staging.
 
-## 11) Deployment Modes Summary
+## 12) Deployment Modes Summary
 
 The platform supports multiple deployment modes to fit different operational needs:
 

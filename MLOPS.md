@@ -6,6 +6,7 @@ Below is the MLOps guide for the YouTube Success Prediction ML Platform, detaili
 
 - [Document Metadata](#document-metadata)
 - [Documentation Map](#documentation-map)
+- [Dataset Overview](#dataset-overview)
 - [Artifact Lifecycle](#artifact-lifecycle)
 - [Manifest + Registry](#manifest--registry)
 - [Drift Operations](#drift-operations)
@@ -33,6 +34,40 @@ Below is the MLOps guide for the YouTube Success Prediction ML Platform, detaili
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Component and data lifecycle context | You need system-level interaction details |
 | [`API_REFERENCE.md`](API_REFERENCE.md) | MLOps endpoint contracts | You need drift/manifest/registry API behavior |
 | [`DEPLOYMENT.md`](DEPLOYMENT.md) | Promotion and rollout controls | You need release orchestration policy alignment |
+
+## Dataset Overview
+
+MLOps lineage in this project is dataset-aware and records the exact dataset hash used by each training run.
+
+Primary source dataset:
+
+- default file: `data/Global YouTube Statistics.csv`
+- encoding: `latin-1`
+- row count: `995`
+- raw columns: `28`
+
+Processed dataset artifact:
+
+- file: `data/global_youtube_statistics_processed.csv`
+- row count: `995`
+- processed columns: `30`
+- includes engineered fields: `age`, `growth_target`
+
+Path resolution behavior (training/runtime):
+
+- resolver: `resolve_data_path()` in `src/youtube_success_ml/data/loader.py`
+- default env override: `YTS_DATA_PATH`
+- project root override: `YTS_PROJECT_ROOT`
+- CI stabilization variables:
+  - `YTS_PROJECT_ROOT=${{ github.workspace }}`
+  - `YTS_DATA_PATH=${{ github.workspace }}/data/Global YouTube Statistics.csv`
+  - `YTS_ARTIFACT_DIR=${{ github.workspace }}/artifacts`
+
+MLOps relevance:
+
+- every manifest captures `data_path` and `data_sha256`
+- registry changes (`active_run_id`) should always be interpreted together with dataset fingerprint
+- retraining/promotion decisions should verify dataset continuity or explicitly document dataset drift
 
 ## Artifact Lifecycle
 

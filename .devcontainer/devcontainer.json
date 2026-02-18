@@ -1,5 +1,5 @@
 {
-  "name": "YouTube Success ML Dev Container",
+  "name": "YouTube Success Prediction ML Dev Container",
   "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {

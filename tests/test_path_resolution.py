@@ -9,7 +9,9 @@ def test_resolve_data_path_from_cwd_data_dir(monkeypatch: pytest.MonkeyPatch, tm
     dataset_dir = tmp_path / "data"
     dataset_dir.mkdir(parents=True, exist_ok=True)
     dataset_path = dataset_dir / "Global YouTube Statistics.csv"
-    dataset_path.write_text("uploads,category,country\n1,Education,United States\n", encoding="utf-8")
+    dataset_path.write_text(
+        "uploads,category,country\n1,Education,United States\n", encoding="utf-8"
+    )
 
     monkeypatch.chdir(tmp_path)
     monkeypatch.delenv("YTS_DATA_PATH", raising=False)
