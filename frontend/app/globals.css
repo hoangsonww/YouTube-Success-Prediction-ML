@@ -715,6 +715,53 @@ tr:hover td {
   word-break: break-word;
 }
 
+.demoNotice {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #ffe0b8;
+  background: #fff7eb;
+  color: #7b4a04;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.skeletonText {
+  display: inline-block;
+  width: 7.5rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #eaf0ff 25%, #dbe6ff 50%, #eaf0ff 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonText.skeletonLg {
+  height: 2rem;
+}
+
+.skeletonText.skeletonMd {
+  height: 1.35rem;
+  width: 12rem;
+}
+
+.skeletonRow {
+  height: 0.95rem;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #edf3ff 25%, #dce7ff 50%, #edf3ff 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonChart {
+  width: 100%;
+  height: 240px;
+  border-radius: 12px;
+  border: 1px solid #d6e3ff;
+  background: linear-gradient(90deg, #edf3ff 25%, #dce7ff 50%, #edf3ff 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
 .error {
   margin: 0;
   color: var(--danger);
@@ -755,6 +802,15 @@ tr:hover td {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }
 

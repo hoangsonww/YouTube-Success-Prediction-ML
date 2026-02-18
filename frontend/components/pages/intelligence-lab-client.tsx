@@ -18,6 +18,7 @@ import { AppShell } from "@/components/ui/app-shell";
 import {
   getFeatureImportance,
   getRecommendation,
+  isOfflineFallbackModeEnabled,
   predictBatch,
   runDriftCheck,
   simulatePrediction,
@@ -175,6 +176,7 @@ export function IntelligenceLabClient() {
   const [batchResult, setBatchResult] = useState<BatchPredictionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -323,6 +325,7 @@ export function IntelligenceLabClient() {
       setRecommendation(rec);
       setImportance(fi);
       setDrift(driftResult);
+      setOfflineMode(isOfflineFallbackModeEnabled());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run intelligence workflows.");
     } finally {
@@ -343,6 +346,7 @@ export function IntelligenceLabClient() {
       const items = parseBatchInput(batchText);
       const batch = await predictBatch(items);
       setBatchResult(batch);
+      setOfflineMode(isOfflineFallbackModeEnabled());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Batch inference failed.");
     } finally {
@@ -361,6 +365,13 @@ export function IntelligenceLabClient() {
       ]}
     >
       {error && <p className="error">{error}</p>}
+      {offlineMode && (
+        <div className="demoNotice">
+          Demo mode is active because the backend API is unreachable. Model Lab outputs are using
+          local fallback simulation data. Run and connect the backend API to unlock all live model
+          capabilities.
+        </div>
+      )}
 
       <section className="panelGrid panelGrid2">
         <article className="panel">

@@ -30,6 +30,7 @@ import {
   getProcessedSample,
   getRawSample,
   getUploadGrowthBuckets,
+  isOfflineFallbackModeEnabled,
 } from "@/lib/api";
 import type {
   CategoryPerformanceRecord,
@@ -80,6 +81,8 @@ export function ChartsPageClient() {
   const [categoryPerformance, setCategoryPerformance] = useState<CategoryPerformanceRecord[]>([]);
   const [uploadBuckets, setUploadBuckets] = useState<UploadGrowthBucketRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -101,8 +104,10 @@ export function ChartsPageClient() {
         setProcessedSample(processedRows);
         setCategoryPerformance(categoryRows);
         setUploadBuckets(bucketRows);
+        setOfflineMode(isOfflineFallbackModeEnabled());
       })
-      .catch((err: Error) => setError(err.message));
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setDataLoading(false));
   }, []);
 
   const topCountries = useMemo(
@@ -180,6 +185,22 @@ export function ChartsPageClient() {
       ]}
     >
       {error && <p className="error">{error}</p>}
+      {offlineMode && (
+        <div className="demoNotice">
+          Demo mode is active because the backend API is unreachable. These charts and tables use
+          placeholder analytics data. Start the backend and set `NEXT_PUBLIC_API_BASE_URL` for full
+          live functionality.
+        </div>
+      )}
+      {dataLoading && (
+        <section className="panel">
+          <div className="panelHeader">
+            <h2>Loading Analytics Dataset</h2>
+            <span className="chip">Skeleton</span>
+          </div>
+          <div className="skeletonChart" />
+        </section>
+      )}
 
       <section className="panelGrid panelGrid2">
         <article className="panel chartPanel">
@@ -419,18 +440,26 @@ export function ChartsPageClient() {
                 </tr>
               </thead>
               <tbody>
-                {rawSample.map((row) => (
-                  <tr key={`raw-${row.youtuber}`}>
-                    <td>{row.youtuber}</td>
-                    <td>{fmt(row.uploads)}</td>
-                    <td>{row.category ?? "null"}</td>
-                    <td>{row.country ?? "null"}</td>
-                    <td>{fmt(row.subscribers)}</td>
-                    <td>{fmt(row.highest_yearly_earnings)}</td>
-                    <td>{row.subscribers_for_last_30_days ?? "null"}</td>
-                    <td>{row.created_year ?? "null"}</td>
-                  </tr>
-                ))}
+                {dataLoading
+                  ? Array.from({ length: 6 }).map((_, idx) => (
+                      <tr key={`raw-skeleton-${idx}`}>
+                        <td colSpan={8}>
+                          <div className="skeletonRow" />
+                        </td>
+                      </tr>
+                    ))
+                  : rawSample.map((row) => (
+                      <tr key={`raw-${row.youtuber}`}>
+                        <td>{row.youtuber}</td>
+                        <td>{fmt(row.uploads)}</td>
+                        <td>{row.category ?? "null"}</td>
+                        <td>{row.country ?? "null"}</td>
+                        <td>{fmt(row.subscribers)}</td>
+                        <td>{fmt(row.highest_yearly_earnings)}</td>
+                        <td>{row.subscribers_for_last_30_days ?? "null"}</td>
+                        <td>{row.created_year ?? "null"}</td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
@@ -456,18 +485,26 @@ export function ChartsPageClient() {
                 </tr>
               </thead>
               <tbody>
-                {processedSample.slice(0, 12).map((row) => (
-                  <tr key={`processed-${row.youtuber}-${row.uploads}`}>
-                    <td>{row.youtuber}</td>
-                    <td>{fmt(row.uploads)}</td>
-                    <td>{row.category}</td>
-                    <td>{row.country}</td>
-                    <td>{row.age}</td>
-                    <td>{fmt(row.subscribers)}</td>
-                    <td>{fmt(row.highest_yearly_earnings)}</td>
-                    <td>{fmt(row.growth_target)}</td>
-                  </tr>
-                ))}
+                {dataLoading
+                  ? Array.from({ length: 6 }).map((_, idx) => (
+                      <tr key={`processed-skeleton-${idx}`}>
+                        <td colSpan={8}>
+                          <div className="skeletonRow" />
+                        </td>
+                      </tr>
+                    ))
+                  : processedSample.slice(0, 12).map((row) => (
+                      <tr key={`processed-${row.youtuber}-${row.uploads}`}>
+                        <td>{row.youtuber}</td>
+                        <td>{fmt(row.uploads)}</td>
+                        <td>{row.category}</td>
+                        <td>{row.country}</td>
+                        <td>{row.age}</td>
+                        <td>{fmt(row.subscribers)}</td>
+                        <td>{fmt(row.highest_yearly_earnings)}</td>
+                        <td>{fmt(row.growth_target)}</td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
