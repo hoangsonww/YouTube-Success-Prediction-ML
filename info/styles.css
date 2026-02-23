@@ -295,6 +295,43 @@ a {
   box-shadow: 0 14px 30px rgba(70, 89, 210, 0.5);
 }
 
+.hero-cta .btn-github {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(125deg, rgba(79, 149, 255, 0.28), rgba(62, 201, 184, 0.2));
+  border-color: rgba(160, 191, 255, 0.66);
+  box-shadow: 0 10px 24px rgba(24, 53, 109, 0.34);
+}
+
+.hero-cta .btn-github::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 22%,
+    rgba(232, 238, 251, 0.34) 50%,
+    rgba(255, 255, 255, 0) 78%
+  );
+  transform: translateX(-145%);
+}
+
+.hero-cta .btn-github:hover,
+.hero-cta .btn-github:focus-visible {
+  border-color: rgba(186, 211, 255, 0.92);
+  box-shadow: 0 15px 30px rgba(26, 60, 125, 0.46);
+}
+
+.hero-cta .btn-github:hover::after,
+.hero-cta .btn-github:focus-visible::after {
+  opacity: 1;
+  animation: btn-sheen 0.86s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 .hero.reveal.in-view .kicker,
 .hero.reveal.in-view h1,
 .hero.reveal.in-view .lead,
@@ -320,6 +357,16 @@ a {
 
 .hero.reveal.in-view .hero-cta .btn:nth-child(3) {
   animation-delay: 0.4s;
+}
+
+.hero.reveal.in-view .hero-cta .btn:nth-child(4) {
+  animation-delay: 0.48s;
+}
+
+.hero.reveal.in-view .hero-cta .btn-github {
+  animation:
+    hero-enter 0.62s ease 0.48s both,
+    github-pulse 3.6s ease-in-out 1.2s infinite;
 }
 
 .btn {
@@ -743,6 +790,25 @@ a {
   }
 }
 
+@keyframes github-pulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 24px rgba(24, 53, 109, 0.34);
+  }
+  50% {
+    box-shadow: 0 16px 32px rgba(31, 77, 154, 0.46);
+  }
+}
+
+@keyframes btn-sheen {
+  from {
+    transform: translateX(-145%);
+  }
+  to {
+    transform: translateX(145%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .metrics-grid .metric-card.in-view {
     animation: none;
@@ -750,6 +816,15 @@ a {
 
   .metric-card h3.count-complete {
     text-shadow: none;
+  }
+
+  .hero.reveal.in-view .hero-cta .btn-github {
+    animation: none;
+  }
+
+  .hero-cta .btn-github::after {
+    animation: none;
+    opacity: 0;
   }
 }
 
