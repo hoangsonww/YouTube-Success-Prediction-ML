@@ -86,3 +86,9 @@ terraform-plan-azure:
 
 terraform-plan-oci:
 	cd infra/terraform/environments/oci && terraform init && terraform plan
+
+.PHONY: show-runtime-info
+show-runtime-info:
+	@echo "Node: $$(node --version 2>/dev/null || echo unavailable)"
+	@echo "npm: $$(npm --version 2>/dev/null || echo unavailable)"
+	@echo "Python: $$(python3 --version 2>/dev/null || python --version 2>/dev/null || echo unavailable)"
