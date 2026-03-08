@@ -72,6 +72,312 @@ const MAP_VIEWS: Array<{ kind: MapEmbedKind; label: string; subtitle: string }> 
   },
 ];
 
+const FALLBACK_MAP_COUNTRIES: CountryMetricRecord[] = [
+  {
+    country: "United States",
+    abbreviation: "US",
+    total_subscribers: 205000000,
+    total_earnings: 40800000,
+    dominant_category: "Entertainment",
+    latitude: 37.0902,
+    longitude: -95.7129,
+    channel_count: 312,
+    avg_growth: 128000,
+  },
+  {
+    country: "India",
+    abbreviation: "IN",
+    total_subscribers: 194000000,
+    total_earnings: 37900000,
+    dominant_category: "Music",
+    latitude: 20.5937,
+    longitude: 78.9629,
+    channel_count: 294,
+    avg_growth: 142000,
+  },
+  {
+    country: "United Kingdom",
+    abbreviation: "GB",
+    total_subscribers: 84000000,
+    total_earnings: 16500000,
+    dominant_category: "Education",
+    latitude: 55.3781,
+    longitude: -3.436,
+    channel_count: 126,
+    avg_growth: 72000,
+  },
+  {
+    country: "Brazil",
+    abbreviation: "BR",
+    total_subscribers: 72000000,
+    total_earnings: 14100000,
+    dominant_category: "People & Blogs",
+    latitude: -14.235,
+    longitude: -51.9253,
+    channel_count: 118,
+    avg_growth: 69000,
+  },
+  {
+    country: "Japan",
+    abbreviation: "JP",
+    total_subscribers: 68000000,
+    total_earnings: 12900000,
+    dominant_category: "Gaming",
+    latitude: 36.2048,
+    longitude: 138.2529,
+    channel_count: 104,
+    avg_growth: 64000,
+  },
+  {
+    country: "South Korea",
+    abbreviation: "KR",
+    total_subscribers: 64000000,
+    total_earnings: 12400000,
+    dominant_category: "Music",
+    latitude: 35.9078,
+    longitude: 127.7669,
+    channel_count: 98,
+    avg_growth: 67000,
+  },
+  {
+    country: "Canada",
+    abbreviation: "CA",
+    total_subscribers: 53000000,
+    total_earnings: 10300000,
+    dominant_category: "Science & Technology",
+    latitude: 56.1304,
+    longitude: -106.3468,
+    channel_count: 86,
+    avg_growth: 51000,
+  },
+  {
+    country: "Germany",
+    abbreviation: "DE",
+    total_subscribers: 47000000,
+    total_earnings: 9200000,
+    dominant_category: "News & Politics",
+    latitude: 51.1657,
+    longitude: 10.4515,
+    channel_count: 79,
+    avg_growth: 43000,
+  },
+];
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function jsonForInlineScript(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
+function buildFallbackMapHtml(
+  kind: MapEmbedKind,
+  rows: CountryMetricRecord[],
+  title: string,
+  subtitle: string
+) {
+  const candidates = rows
+    .filter(
+      (row) =>
+        typeof row.latitude === "number" &&
+        Number.isFinite(row.latitude) &&
+        typeof row.longitude === "number" &&
+        Number.isFinite(row.longitude)
+    )
+    .slice(0, 24);
+
+  const categories = Array.from(new Set(candidates.map((row) => row.dominant_category)));
+  const categoryColors = new Map<string, string>();
+  categories.forEach((category, index) => {
+    categoryColors.set(category, palette[index % palette.length]);
+  });
+
+  const subscribersMax = Math.max(...candidates.map((row) => row.total_subscribers), 1);
+  const earningsMax = Math.max(...candidates.map((row) => row.total_earnings), 1);
+  const growthMax = Math.max(...candidates.map((row) => row.avg_growth ?? 0), 1);
+  const channelMax = Math.max(...candidates.map((row) => row.channel_count ?? 1), 1);
+
+  const points = candidates.map((row) => {
+    const subscriberRatio = row.total_subscribers / subscribersMax;
+    const earningsRatio = row.total_earnings / earningsMax;
+    const growthRatio = (row.avg_growth ?? 0) / growthMax;
+    const channelRatio = (row.channel_count ?? 1) / channelMax;
+
+    let color = "#2f6fed";
+    let radius = 9;
+    if (kind === "influence-map") {
+      color = `hsl(${220 - growthRatio * 68}, 86%, ${43 + growthRatio * 13}%)`;
+      radius = 8 + subscriberRatio * 16;
+    } else if (kind === "earnings-choropleth") {
+      color = `hsl(${36 - earningsRatio * 30}, 95%, ${48 + earningsRatio * 7}%)`;
+      radius = 8 + earningsRatio * 16;
+    } else {
+      color = categoryColors.get(row.dominant_category) ?? "#14b8a6";
+      radius = 8 + channelRatio * 14;
+    }
+
+    const popup = [
+      `<strong>${escapeHtml(row.country)}</strong>`,
+      `Subs: ${fmt(row.total_subscribers)}`,
+      `Earnings: ${fmt(row.total_earnings)}`,
+      `Category: ${escapeHtml(row.dominant_category)}`,
+      `Growth: ${fmt(row.avg_growth ?? 0)}`,
+      `Channels: ${fmt(row.channel_count ?? 0)}`,
+    ].join("<br/>");
+
+    return {
+      country: row.country,
+      latitude: row.latitude ?? 0,
+      longitude: row.longitude ?? 0,
+      color,
+      radius,
+      popup,
+    };
+  });
+
+  const avgLat =
+    points.length > 0 ? points.reduce((sum, point) => sum + point.latitude, 0) / points.length : 20;
+  const avgLon =
+    points.length > 0 ? points.reduce((sum, point) => sum + point.longitude, 0) / points.length : 0;
+
+  const pointsJson = jsonForInlineScript(points);
+  const legendText =
+    kind === "influence-map"
+      ? "Bubble size scales by total subscribers; color reflects growth momentum."
+      : kind === "earnings-choropleth"
+        ? "Bubble size and color intensity reflect yearly earnings concentration."
+        : "Bubble size scales by channel count; color encodes dominant content category.";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background: #eaf1fb;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .leaflet-container {
+      background: linear-gradient(180deg, #eef5ff, #dce8fb);
+    }
+    .map-headline {
+      position: absolute;
+      z-index: 500;
+      left: 12px;
+      top: 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(195, 212, 241, 0.9);
+      padding: 6px 9px;
+      line-height: 1.25;
+      color: #163e79;
+      box-shadow: 0 4px 16px rgba(23, 56, 112, 0.14);
+    }
+    .map-headline strong {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    .map-headline span {
+      display: block;
+      margin-top: 2px;
+      font-size: 11px;
+      color: #49689b;
+      max-width: 320px;
+    }
+    .map-error {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #264b84;
+      padding: 1rem;
+      background: linear-gradient(180deg, rgba(238, 245, 255, 0.95), rgba(228, 238, 255, 0.95));
+      font-size: 13px;
+      z-index: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="map-headline">
+    <strong>${escapeHtml(title)} (Demo Data)</strong>
+    <span>${escapeHtml(subtitle)}</span>
+    <span>${escapeHtml(legendText)}</span>
+  </div>
+  <div id="map"></div>
+  <div id="mapError" class="map-error">
+    Map tiles could not be loaded. Demo geospatial points remain available.
+  </div>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script>
+    (function () {
+      if (!window.L) {
+        const error = document.getElementById("mapError");
+        if (error) error.style.display = "flex";
+        return;
+      }
+      const points = ${pointsJson};
+      const map = L.map("map", {
+        zoomControl: true,
+        worldCopyJump: true,
+        minZoom: 2,
+        maxZoom: 6,
+      }).setView([${avgLat.toFixed(4)}, ${avgLon.toFixed(4)}], 2);
+
+      const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 6,
+        attribution: "&copy; OpenStreetMap contributors",
+      });
+
+      tileLayer.on("tileerror", function () {
+        const error = document.getElementById("mapError");
+        if (error) error.style.display = "flex";
+      });
+      tileLayer.addTo(map);
+
+      points.forEach(function (point) {
+        const marker = L.circleMarker([point.latitude, point.longitude], {
+          radius: point.radius,
+          color: point.color,
+          fillColor: point.color,
+          fillOpacity: 0.46,
+          weight: 2,
+        }).addTo(map);
+        marker.bindPopup(point.popup, { maxWidth: 260 });
+      });
+    })();
+  </script>
+</body>
+</html>`;
+}
+
 function compact(value: number) {
   return new Intl.NumberFormat("en-US", {
     notation: "compact",
@@ -231,6 +537,29 @@ export function ChartsPageClient() {
     [countries]
   );
 
+  const mapFallbackRows = useMemo(() => {
+    const withGeo = countries.filter(
+      (row) =>
+        typeof row.latitude === "number" &&
+        Number.isFinite(row.latitude) &&
+        typeof row.longitude === "number" &&
+        Number.isFinite(row.longitude)
+    );
+    return (withGeo.length > 0 ? withGeo : FALLBACK_MAP_COUNTRIES).slice(0, 16);
+  }, [countries]);
+
+  const mapUsingFallback = offlineMode || mapFrameError !== null;
+  const fallbackMapHtml = useMemo(
+    () =>
+      buildFallbackMapHtml(
+        activeMapView,
+        mapFallbackRows,
+        activeMapConfig.label,
+        activeMapConfig.subtitle
+      ),
+    [activeMapConfig.label, activeMapConfig.subtitle, activeMapView, mapFallbackRows]
+  );
+
   const mapCategoryLeaders = useMemo(() => {
     const counts = new Map<string, number>();
     countries.forEach((row) => {
@@ -261,8 +590,8 @@ export function ChartsPageClient() {
       {offlineMode && (
         <div className="demoNotice">
           Demo mode is active because the backend API is unreachable. These charts and tables use
-          placeholder analytics data. Start the backend and set `NEXT_PUBLIC_API_BASE_URL` for full
-          live functionality.
+          placeholder analytics data, and map tabs render realistic demo geo views. Start the
+          backend and set `NEXT_PUBLIC_API_BASE_URL` for full live iframe maps.
         </div>
       )}
       {dataLoading && (
@@ -302,34 +631,37 @@ export function ChartsPageClient() {
         </div>
 
         <div className="mapFrameShell">
-          {!offlineMode && !mapFrameError && mounted ? (
+          {!mounted ? (
+            <div className="chartPlaceholder">Preparing map...</div>
+          ) : (
             <>
               {!mapLoaded && (
                 <div className="mapFrameOverlay">Rendering {activeMapConfig.label} map...</div>
               )}
               <iframe
-                key={activeMapView}
+                key={`${activeMapView}-${mapUsingFallback ? "fallback" : "live"}`}
                 title={`Global map: ${activeMapConfig.label}`}
-                src={mapUrl}
+                src={mapUsingFallback ? undefined : mapUrl}
+                srcDoc={mapUsingFallback ? fallbackMapHtml : undefined}
                 className="mapFrame"
                 loading="lazy"
                 onLoad={() => setMapLoaded(true)}
                 onError={() => {
-                  setMapFrameError("The map iframe failed to load from the backend.");
-                  setMapLoaded(false);
+                  if (!mapUsingFallback) {
+                    setMapFrameError("The map iframe failed to load from the backend.");
+                    setMapLoaded(false);
+                  }
                 }}
               />
             </>
-          ) : (
-            <div className="chartPlaceholder">
-              {!mounted
-                ? "Preparing map..."
-                : offlineMode
-                  ? "Map rendering requires the backend API. Start it and set NEXT_PUBLIC_API_BASE_URL."
-                  : (mapFrameError ?? "Unable to load map content.")}
-            </div>
           )}
         </div>
+        {mapUsingFallback && (
+          <p className="mutedText">
+            Live backend map iframe unavailable. Showing a real interactive demo map with local
+            analytics fallback data.
+          </p>
+        )}
 
         <div className="mapStatsGrid">
           <article className="mapStatCard">
