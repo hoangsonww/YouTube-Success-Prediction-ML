@@ -21,7 +21,7 @@ This directory provisions production infrastructure for four cloud targets:
 | --- | --- |
 | Document role | Terraform provisioning guide for cloud packs |
 | Primary audience | Cloud/platform engineers and infrastructure operators |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Environments | AWS, GCP, Azure, OCI |
 | Module strategy | Shared tagging + provider-specific platform modules |
 
@@ -58,3 +58,4 @@ terraform apply
 - Backend values are placeholders and must be replaced before production use.
 - Provider credentials are not stored in repo and must come from secure CI secrets.
 - Validate each environment in isolated workspaces (dev/staging/prod).
+- After infra apply and workload deployment, validate API map endpoints and the latest frontend visual card set as part of release acceptance.

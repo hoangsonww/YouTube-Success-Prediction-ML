@@ -15,7 +15,7 @@
 | --- | --- |
 | Document role | Kubernetes runtime and strategy overlay reference |
 | Primary audience | Platform engineers, SREs, release engineers |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Runtime target namespace | `yts-prod` |
 | Strategy modes | `rolling`, `canary`, `bluegreen` |
 
@@ -70,3 +70,11 @@ kubectl apply -k infra/k8s/monitoring
 ## Strategy Selection
 
 Only one strategy overlay should be actively synced in Argo CD at a time.
+
+After rollout, verify the frontend expectations tied to API contracts:
+
+- map HTML endpoints return `200` (`/maps/influence-map`, `/maps/earnings-choropleth`, `/maps/category-dominance`)
+- overview route renders six intelligence cards above Global Country Intelligence
+- intelligence lab route renders four cards above Batch Prediction Workbench
+- Drift Snapshot card remains rendered before drift run with explicit run-lab guidance while idle
+- top-left icon control collapses and re-expands sticky navbar with animation

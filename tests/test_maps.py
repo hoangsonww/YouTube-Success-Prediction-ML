@@ -18,3 +18,5 @@ def test_map_builders_return_objects():
     assert earnings is not None
     assert dominance is not None
     assert len(metrics) > 0
+    assert "latitude" in metrics[0]
+    assert "longitude" in metrics[0]

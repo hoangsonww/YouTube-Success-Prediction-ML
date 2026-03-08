@@ -82,6 +82,10 @@ export type CountryMetricRecord = {
   total_subscribers: number;
   total_earnings: number;
   dominant_category: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  channel_count?: number;
+  avg_growth?: number;
 };
 
 export type RawChannelSample = {

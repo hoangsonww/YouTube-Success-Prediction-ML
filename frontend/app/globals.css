@@ -76,6 +76,67 @@ a {
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
   min-width: 0;
+  overflow: clip;
+  max-height: 220px;
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    max-height 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.24s ease,
+    transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    padding 0.28s ease,
+    border-color 0.24s ease;
+}
+
+.topbar.topbarCollapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-color: transparent;
+  opacity: 0;
+  transform: translateY(-18px);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.topbarDockToggle {
+  position: fixed;
+  top: 1.28rem;
+  left: 0.95rem;
+  z-index: 31;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 14, 32, 0.7);
+  backdrop-filter: blur(8px);
+  color: #f4f7ff;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.topbarDockIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.topbarDockToggle:hover {
+  background: rgba(18, 35, 76, 0.84);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.topbarDockToggle.collapsed {
+  background: rgba(34, 111, 237, 0.8);
+  border-color: rgba(181, 213, 255, 0.8);
 }
 
 .topbarBrand {
@@ -575,6 +636,168 @@ tr:hover td {
   overflow: hidden;
 }
 
+.mapPanel {
+  background:
+    radial-gradient(circle at 12% -20%, rgba(87, 141, 255, 0.2), rgba(87, 141, 255, 0) 42%),
+    radial-gradient(circle at 88% -15%, rgba(28, 184, 162, 0.17), rgba(28, 184, 162, 0) 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.96));
+}
+
+.mapControlBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.mapHint {
+  margin: 0;
+  color: #48618e;
+  font-size: 0.87rem;
+}
+
+.mapToggleGroup {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.2rem;
+  background: #eef4ff;
+  border: 1px solid #d7e3fb;
+  border-radius: 999px;
+}
+
+.mapToggleButton {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2e4d86;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mapToggleButton:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.mapToggleButton.active {
+  background: #fff;
+  color: #173f84;
+  border-color: #b7cdf5;
+}
+
+.mapFrameShell {
+  position: relative;
+  width: 100%;
+  height: 440px;
+  border: 1px solid #d5e3fd;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(237, 244, 255, 0.86), rgba(237, 244, 255, 0.38)),
+    linear-gradient(180deg, #f9fcff, #f3f8ff);
+  overflow: hidden;
+}
+
+.mapFrame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: transparent;
+}
+
+.mapFrameOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(246, 250, 255, 0.92), rgba(236, 244, 255, 0.85));
+  color: #35588f;
+  font-size: 0.9rem;
+}
+
+.clusterTooltip {
+  border: 1px solid #cdddf8;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 8px 24px rgba(20, 44, 90, 0.16);
+  padding: 0.58rem 0.66rem;
+  min-width: 220px;
+}
+
+.clusterTooltip strong {
+  display: block;
+  margin-bottom: 0.24rem;
+  color: #183f86;
+}
+
+.clusterTooltip p {
+  margin: 0.18rem 0;
+  font-size: 0.8rem;
+  color: #45608f;
+}
+
+.mapStatsGrid {
+  margin-top: 0.84rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.62rem;
+}
+
+.mapStatCard {
+  border: 1px solid #d8e5ff;
+  border-radius: 12px;
+  background: linear-gradient(165deg, rgba(246, 251, 255, 0.94), rgba(234, 243, 255, 0.94));
+  padding: 0.68rem;
+}
+
+.mapStatCard p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #5471a0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mapStatCard strong {
+  display: block;
+  margin-top: 0.34rem;
+  font-family: var(--font-heading);
+  font-size: 1.18rem;
+  color: #11356f;
+}
+
+.mapLegendRow {
+  margin-top: 0.74rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+
+.mapLegendChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  border-radius: 999px;
+  border: 1px solid #d8e5ff;
+  background: rgba(255, 255, 255, 0.82);
+  color: #35588f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.25rem 0.58rem;
+}
+
+.mapLegendChip i {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: linear-gradient(180deg, #5d8eff, #1cb8a2);
+}
+
 .chartPlaceholder {
   width: 100%;
   height: 100%;
@@ -853,11 +1076,26 @@ tr:hover td {
   .batchEditorActions {
     width: 100%;
   }
+
+  .mapStatsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mapFrameShell {
+    height: 380px;
+  }
 }
 
 @media (max-width: 720px) {
   .pageShell {
     padding: 0.8rem;
+  }
+
+  .topbarDockToggle {
+    top: 1rem;
+    left: 0.74rem;
+    width: 2.35rem;
+    height: 2.35rem;
   }
 
   .topbar {
@@ -925,6 +1163,26 @@ tr:hover td {
     height: 300px;
   }
 
+  .mapControlBar {
+    align-items: flex-start;
+  }
+
+  .mapToggleGroup {
+    width: 100%;
+  }
+
+  .mapToggleButton {
+    flex: 1;
+  }
+
+  .mapStatsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mapFrameShell {
+    height: 340px;
+  }
+
   .wikiFrame {
     height: 70vh;
   }
@@ -945,6 +1203,10 @@ tr:hover td {
   .chartWrap,
   .chartWrapTall {
     height: 260px;
+  }
+
+  .mapFrameShell {
+    height: 320px;
   }
 
   .tableShell,

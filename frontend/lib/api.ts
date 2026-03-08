@@ -21,6 +21,8 @@ const UPLOAD_BUCKET_ORDER = ["0-100", "101-500", "501-2k", "2k-10k", "10k+"];
 let processedSampleFallbackPromise: Promise<ProcessedChannelSample[]> | null = null;
 let offlineFallbackMode = false;
 
+export type MapEmbedKind = "influence-map" | "earnings-choropleth" | "category-dominance";
+
 const FALLBACK_PROCESSED_SAMPLE: ProcessedChannelSample[] = [
   {
     youtuber: "Demo Education Hub",
@@ -194,6 +196,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 205000000,
     total_earnings: 40800000,
     dominant_category: "Entertainment",
+    latitude: 37.0902,
+    longitude: -95.7129,
+    channel_count: 312,
+    avg_growth: 128000,
   },
   {
     country: "India",
@@ -201,6 +207,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 194000000,
     total_earnings: 37900000,
     dominant_category: "Music",
+    latitude: 20.5937,
+    longitude: 78.9629,
+    channel_count: 294,
+    avg_growth: 142000,
   },
   {
     country: "United Kingdom",
@@ -208,6 +218,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 84000000,
     total_earnings: 16500000,
     dominant_category: "Education",
+    latitude: 55.3781,
+    longitude: -3.436,
+    channel_count: 126,
+    avg_growth: 72000,
   },
   {
     country: "Brazil",
@@ -215,6 +229,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 72000000,
     total_earnings: 14100000,
     dominant_category: "People & Blogs",
+    latitude: -14.235,
+    longitude: -51.9253,
+    channel_count: 118,
+    avg_growth: 69000,
   },
   {
     country: "Japan",
@@ -222,6 +240,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 68000000,
     total_earnings: 12900000,
     dominant_category: "Gaming",
+    latitude: 36.2048,
+    longitude: 138.2529,
+    channel_count: 104,
+    avg_growth: 64000,
   },
   {
     country: "South Korea",
@@ -229,6 +251,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 64000000,
     total_earnings: 12400000,
     dominant_category: "Music",
+    latitude: 35.9078,
+    longitude: 127.7669,
+    channel_count: 98,
+    avg_growth: 67000,
   },
   {
     country: "Canada",
@@ -236,6 +262,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 53000000,
     total_earnings: 10300000,
     dominant_category: "Science & Technology",
+    latitude: 56.1304,
+    longitude: -106.3468,
+    channel_count: 86,
+    avg_growth: 51000,
   },
   {
     country: "Germany",
@@ -243,6 +273,10 @@ const FALLBACK_COUNTRIES: CountryMetricRecord[] = [
     total_subscribers: 47000000,
     total_earnings: 9200000,
     dominant_category: "News & Politics",
+    latitude: 51.1657,
+    longitude: 10.4515,
+    channel_count: 79,
+    avg_growth: 43000,
   },
 ];
 
@@ -672,6 +706,10 @@ export async function getCountryMetrics(): Promise<CountryMetricRecord[]> {
     markOfflineFallbackMode();
     return FALLBACK_COUNTRIES;
   }
+}
+
+export function getMapEmbedUrl(kind: MapEmbedKind): string {
+  return `${API_BASE}/maps/${kind}`;
 }
 
 export async function getRawSample(limit = 10): Promise<RawChannelSample[]> {

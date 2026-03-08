@@ -12,6 +12,8 @@ This frontend is an app-router Next.js app (in `frontend/`) that consumes FastAP
 - [Documentation Map](#documentation-map)
 - [Routes](#routes)
 - [Architecture](#architecture)
+- [Visual Composition Map](#visual-composition-map)
+- [Navigation Interaction Map](#navigation-interaction-map)
 - [SEO + Metadata](#seo--metadata)
 - [Charts Stack](#charts-stack)
 - [API Contract](#api-contract)
@@ -52,7 +54,7 @@ The UI is designed to provide a comprehensive dashboard for YouTube success pred
 | --- | --- |
 | Document role | Frontend architecture and integration guide |
 | Primary audience | Frontend engineers, product engineers, UI platform contributors |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Frontend stack | Next.js 14 + TypeScript + Recharts |
 | API dependency | `NEXT_PUBLIC_API_BASE_URL` |
 
@@ -67,11 +69,12 @@ The UI is designed to provide a comprehensive dashboard for YouTube success pred
 
 ## Routes
 
-- `/`: prediction and platform dashboard.
-- `/visualizations/charts`: analytics and post-processing charts.
-- `/intelligence/lab`: simulation, explainability, and strategy analysis.
+- `/`: prediction and platform dashboard with six visual cards above country intelligence (momentum, archetype wheel, revenue efficiency, category pressure, market share balance, monetization lift).
+- `/visualizations/charts`: real map workspace + analytics and post-processing charts.
+- `/intelligence/lab`: simulation, explainability, strategy analysis, and four insight cards above batch workbench (growth elasticity, explainability concentration, earnings response gradient, drift severity mix), with chart empty-state guidance before first run.
 - `/wiki`: embedded project wiki page.
 - `/wiki/index.html`: standalone static wiki asset.
+- global shell: icon-only top-left control to collapse/expand sticky top navbar with animations.
 
 ## Architecture
 
@@ -85,6 +88,32 @@ flowchart LR
     PageHome --> API[FastAPI]
     PageCharts --> API
     PageLab --> API
+```
+
+## Visual Composition Map
+
+```mermaid
+flowchart TB
+    HOME["/"] --> H1["Prediction + Cluster Table"]
+    HOME --> H2["Global Country Intelligence"]
+    H1 --> HC["Cards: momentum, archetype wheel, efficiency, pressure, share, lift"]
+
+    LAB["/intelligence/lab"] --> L1["Scenario Simulator + Recommendation"]
+    LAB --> L2["Batch Prediction Workbench"]
+    L1 --> LC["Cards: growth elasticity, explainability concentration, earnings response, drift severity mix"]
+    LAB --> DS["Drift Snapshot (always rendered, run-lab text when idle)"]
+```
+
+## Navigation Interaction Map
+
+```mermaid
+stateDiagram-v2
+    [*] --> Expanded
+    Expanded --> Collapsed: top-left icon click
+    Collapsed --> Expanded: top-left icon click
+    Expanded --> MobileMenuOpen: mobile Menu button
+    MobileMenuOpen --> Expanded: close/menu toggle or route change
+    Collapsed --> Collapsed: route changes
 ```
 
 ## SEO + Metadata
@@ -102,11 +131,28 @@ Favicon and icon assets are loaded from `frontend/public/`.
 
 - `recharts` for interactive, responsive charting.
 - Data transforms performed in page clients before visualization.
-- Charts include category performance, upload-growth analysis, cluster compositions, and country-level comparisons.
+- Visuals include:
+  - overview cards: market momentum lens + archetype share wheel + revenue efficiency signals + category pressure map + market share balance + monetization lift curve
+  - real map embeds from backend (`/maps/influence-map`, `/maps/earnings-choropleth`, `/maps/category-dominance`)
+  - category performance and upload-growth analysis
+  - cluster composition + cluster strategy matrix
+  - model lab cards: growth elasticity pulse + explainability concentration + earnings response gradient + drift severity mix
+  - growth/explainability chart cards show explicit "run the lab" empty-state text before first simulation
+  - Drift Snapshot card is always visible and shows explicit run-lab guidance when idle (skeleton only during active lab execution)
+  - icon-only top-left shell control animates navbar collapse/expand without affecting page routing
+  - country-level comparisons and data contract tables
 
 ## API Contract
 
 `NEXT_PUBLIC_API_BASE_URL` must point at the deployed API host.
+
+Visualization-specific dependencies:
+
+- `GET /maps/influence-map` (HTML embed)
+- `GET /maps/earnings-choropleth` (HTML embed)
+- `GET /maps/category-dominance` (HTML embed)
+- `GET /maps/country-metrics` (country totals + geo fields for summary cards)
+- `GET /clusters/summary` (cluster matrix + composition views)
 
 Example:
 

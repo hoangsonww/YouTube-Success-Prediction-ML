@@ -105,7 +105,7 @@
 | --- | --- |
 | Document role | System architecture and engineering design authority |
 | Primary audience | Senior ML/backend/frontend/platform engineers and technical reviewers |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Operational companion | [`README.md`](README.md) |
 | Contract companion | [`API_REFERENCE.md`](API_REFERENCE.md) |
 
@@ -413,6 +413,9 @@ Implementation: `src/youtube_success_ml/models/clustering.py`
 - `GET /predict/feature-importance`
 - `GET /clusters/summary`
 - `GET /maps/country-metrics`
+- `GET /maps/influence-map`
+- `GET /maps/earnings-choropleth`
+- `GET /maps/category-dominance`
 - `GET /data/raw-sample`
 - `GET /data/processed-sample`
 - `GET /analytics/category-performance`
@@ -438,9 +441,9 @@ If critical artifacts are missing, service reports not-ready state, allowing loa
 
 ### Routes
 
-- `/` main dashboard
-- `/visualizations/charts` analytics + raw/processed data comparisons
-- `/intelligence/lab` simulation, recommendation, feature importance, and drift analysis
+- `/` main dashboard with prediction workflow, archetype table, and six visual insight cards above Global Country Intelligence
+- `/visualizations/charts` real world map embeds + analytics + raw/processed data comparisons
+- `/intelligence/lab` simulation, recommendation, explainability, four insight cards above Batch Prediction Workbench, and drift analysis (with run-lab empty-state chart guidance)
 - `/wiki` embedded project wiki route
 - `/wiki/index.html` standalone static wiki landing page
 
@@ -453,7 +456,34 @@ If critical artifacts are missing, service reports not-ready state, allowing loa
 - composable chart + table sections
 - typed data contracts in `frontend/lib/types.ts`
 - progressive loading and error display for asynchronous calls
+- backend-driven iframe map embeds for high-fidelity world map rendering
+- overview visuals include market momentum, archetype-share, revenue-efficiency, category-pressure, market-share-balance, and monetization-lift cards above country intelligence
+- model lab includes growth-elasticity, explainability-concentration, earnings-response, and drift-severity cards above batch workbench
+- drift snapshot panel remains visible at all times; explicit run-lab guidance renders when idle and skeletons are used only during active lab execution
+- icon-only top-left shell control toggles animated collapse/expand of the sticky top navbar
 - dedicated responsive navigation and layout shell for desktop/mobile parity
+
+### Frontend Visual Data Dependencies
+
+```mermaid
+flowchart LR
+    CountryMetrics["/maps/country-metrics"] --> OverviewCards["Overview intelligence cards"]
+    ClusterSummary["/clusters/summary"] --> OverviewCards
+    Simulate["/predict/simulate"] --> LabCards["Growth and earnings lab cards"]
+    FeatureImportance["/predict/feature-importance"] --> LabCards
+    DriftCheck["/mlops/drift-check"] --> DriftPanels["Drift snapshot + severity mix"]
+```
+
+### Frontend Shell Interaction States
+
+```mermaid
+stateDiagram-v2
+    [*] --> NavExpanded
+    NavExpanded --> NavCollapsed: top-left icon toggle
+    NavCollapsed --> NavExpanded: top-left icon toggle
+    NavExpanded --> NavMenuOpen: mobile Menu toggle
+    NavMenuOpen --> NavExpanded: close or route change
+```
 
 ### SEO And Metadata Integration
 
@@ -731,6 +761,9 @@ flowchart LR
 
     Client --> CS["/clusters/summary"]
     Client --> CM["/maps/country-metrics"]
+    Client --> MI["/maps/influence-map"]
+    Client --> ME["/maps/earnings-choropleth"]
+    Client --> MD["/maps/category-dominance"]
     Client --> RS["/data/raw-sample"]
     Client --> PSM["/data/processed-sample"]
 

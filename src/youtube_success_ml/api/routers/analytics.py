@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import numpy as np
 from fastapi import APIRouter, Query
+from fastapi.responses import HTMLResponse
 
 from youtube_success_ml.api.dependencies import get_service
 from youtube_success_ml.data.loader import load_dataset, load_raw_dataset
-from youtube_success_ml.visualization.maps import build_country_metrics
+from youtube_success_ml.visualization.maps import (
+    build_category_dominance_map_html,
+    build_country_metrics,
+    build_earnings_choropleth_html,
+    build_influence_map_html,
+)
 
 router = APIRouter(tags=["analytics"])
 
@@ -20,6 +26,24 @@ def cluster_summary():
 def country_metrics():
     df = load_dataset()
     return {"records": build_country_metrics(df)}
+
+
+@router.get("/maps/influence-map", response_class=HTMLResponse)
+def influence_map():
+    df = load_dataset()
+    return build_influence_map_html(df)
+
+
+@router.get("/maps/earnings-choropleth", response_class=HTMLResponse)
+def earnings_choropleth_map():
+    df = load_dataset()
+    return build_earnings_choropleth_html(df)
+
+
+@router.get("/maps/category-dominance", response_class=HTMLResponse)
+def category_dominance_map():
+    df = load_dataset()
+    return build_category_dominance_map_html(df)
 
 
 @router.get("/data/raw-sample")

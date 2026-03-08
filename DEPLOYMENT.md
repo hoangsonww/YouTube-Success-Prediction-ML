@@ -38,7 +38,7 @@ This project ships a full multi-cloud deployment stack with:
 | --- | --- |
 | Document role | Deployment and release operations runbook |
 | Primary audience | Platform engineers, DevOps engineers, release managers |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Delivery stack | GitHub Actions + Jenkins + Argo CD + Argo Rollouts + Kubernetes + Terraform |
 | Runtime scope | Local Docker and multi-cloud Kubernetes production |
 
@@ -418,8 +418,31 @@ Install before canary/bluegreen production rollout:
 4. `kubectl kustomize infra/k8s/overlays/<strategy>` renders cleanly.
 5. `make train && make test` passing in CI.
 6. `/health` and `/ready` probes succeed post-deploy.
-7. Blue/green manual promotion runbook validated.
-8. Rollback command tested in staging.
+7. Map embed endpoints return `200 text/html`:
+   - `/maps/influence-map`
+   - `/maps/earnings-choropleth`
+   - `/maps/category-dominance`
+8. Frontend map tabs load successfully with `NEXT_PUBLIC_API_BASE_URL` targeting deployed API host.
+9. Overview page renders all six visual cards above Global Country Intelligence.
+10. Intelligence Lab renders all four insight cards above Batch Prediction Workbench.
+11. Growth Curve + Explainability cards show explicit "run the lab" text before first simulation.
+12. Drift Snapshot is visible before drift execution and shows explicit run-lab guidance while idle.
+13. Top-left icon control collapses and re-expands sticky navbar with animation.
+14. Blue/green manual promotion runbook validated.
+15. Rollback command tested in staging.
+
+Post-deploy frontend verification flow:
+
+```mermaid
+flowchart LR
+    Deploy["Deploy API + Frontend"] --> Health["/health + /ready"]
+    Health --> Maps["Verify map endpoints return 200 text/html"]
+    Maps --> Overview["Check 6 overview cards above Global Country Intelligence"]
+    Overview --> Lab["Check 4 lab cards above Batch Prediction Workbench"]
+    Lab --> EmptyState["Verify run-lab empty-state guidance"]
+    EmptyState --> Drift["Verify Drift Snapshot run-lab guidance pre-run"]
+    Drift --> Nav["Verify top-left icon collapses/expands navbar"]
+```
 
 ## 12) Deployment Modes Summary
 

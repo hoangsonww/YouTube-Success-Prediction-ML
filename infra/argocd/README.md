@@ -14,7 +14,7 @@
 | --- | --- |
 | Document role | Argo CD GitOps application control guide |
 | Primary audience | Platform engineers and release operators |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Control scripts | `bootstrap.sh`, `switch-strategy.sh` |
 | Deployment modes | Rolling, canary, blue/green |
 
@@ -50,3 +50,5 @@ bash infra/argocd/switch-strategy.sh canary
 bash infra/argocd/switch-strategy.sh bluegreen
 bash infra/argocd/switch-strategy.sh rolling
 ```
+
+After sync, run the frontend verification checklist in [`../../DEPLOYMENT.md`](../../DEPLOYMENT.md) to confirm map endpoints plus overview/lab card rendering behavior.

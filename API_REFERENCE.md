@@ -9,10 +9,12 @@ Below is the API reference for the YouTube Success Intelligence Service, detaili
 - [Endpoint Map](#endpoint-map)
 - [Endpoint Domains](#endpoint-domains)
 - [Core Contracts](#core-contracts)
+- [Frontend Visual Contract Map](#frontend-visual-contract-map)
 - [Lifecycle Sequence](#lifecycle-sequence)
 - [Validation And Execution Pipeline](#validation-and-execution-pipeline)
 - [Response Decision Tree](#response-decision-tree)
 - [Payload Constraints Summary](#payload-constraints-summary)
+- [Client-Side Shell Controls](#client-side-shell-controls)
 - [Operational Notes](#operational-notes)
 - [Error Semantics](#error-semantics)
 
@@ -22,7 +24,7 @@ Below is the API reference for the YouTube Success Intelligence Service, detaili
 | --- | --- |
 | Document role | API contract and integration authority |
 | Primary audience | Frontend engineers, backend engineers, QA engineers, integrators |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Runtime scope | FastAPI (`:8000`) and Flask (`:5000`) |
 | Contract owner | API/platform engineering |
 
@@ -54,15 +56,18 @@ flowchart TD
     G["/predict/feature-importance"]
     H["/clusters/summary"]
     I["/maps/country-metrics"]
-    J["/analytics/category-performance"]
-    K["/analytics/upload-growth-buckets"]
-    L["/data/raw-sample"]
-    M["/data/processed-sample"]
-    N["/mlops/manifest"]
-    O["/mlops/registry"]
-    P["/mlops/drift-check"]
-    Q["/mlops/capabilities"]
-    R["/metrics"]
+    J["/maps/influence-map"]
+    K["/maps/earnings-choropleth"]
+    L["/maps/category-dominance"]
+    M["/analytics/category-performance"]
+    N["/analytics/upload-growth-buckets"]
+    O["/data/raw-sample"]
+    P["/data/processed-sample"]
+    Q["/mlops/manifest"]
+    R["/mlops/registry"]
+    S["/mlops/drift-check"]
+    T["/mlops/capabilities"]
+    U["/metrics"]
 ```
 
 ## Endpoint Domains
@@ -78,10 +83,13 @@ flowchart LR
     B --> B5["/predict/feature-importance"]
     C[Analytics Domain] --> C1["/clusters/summary"]
     C --> C2["/maps/country-metrics"]
-    C --> C3["/analytics/category-performance"]
-    C --> C4["/analytics/upload-growth-buckets"]
-    C --> C5["/data/raw-sample"]
-    C --> C6["/data/processed-sample"]
+    C --> C3["/maps/influence-map"]
+    C --> C4["/maps/earnings-choropleth"]
+    C --> C5["/maps/category-dominance"]
+    C --> C6["/analytics/category-performance"]
+    C --> C7["/analytics/upload-growth-buckets"]
+    C --> C8["/data/raw-sample"]
+    C --> C9["/data/processed-sample"]
     D[MLOps Domain] --> D1["/mlops/manifest"]
     D --> D2["/mlops/registry"]
     D --> D3["/mlops/drift-check"]
@@ -217,6 +225,44 @@ Returns category-level aggregated performance records including average growth, 
 
 Returns grouped records by upload buckets with average growth/earnings/subscribers and channel counts.
 
+### Map Embed Endpoints
+
+- `GET /maps/influence-map`
+- `GET /maps/earnings-choropleth`
+- `GET /maps/category-dominance`
+
+Return HTML map documents (`Content-Type: text/html`) designed for iframe embedding in the frontend visualization workspace.
+These endpoints provide:
+
+- global influence scatter map
+- earnings choropleth world map
+- dominant category world map
+
+### GET `/maps/country-metrics` Response Shape
+
+Each record includes:
+
+- `country`
+- `abbreviation`
+- `total_subscribers`
+- `total_earnings`
+- `channel_count`
+- `avg_growth`
+- `latitude`
+- `longitude`
+- `dominant_category`
+
+## Frontend Visual Contract Map
+
+```mermaid
+flowchart LR
+    CM["GET /maps/country-metrics"] --> HOME["Overview cards: momentum, efficiency, share/lift"]
+    CS["GET /clusters/summary"] --> HOME2["Overview cards: archetype wheel, category pressure"]
+    SIM["POST /predict/simulate"] --> LAB1["Lab cards: growth curve, growth elasticity, earnings response"]
+    FI["GET /predict/feature-importance"] --> LAB2["Lab cards: explainability charts"]
+    DRIFT["POST /mlops/drift-check"] --> LAB3["Drift Snapshot + Drift Severity Mix"]
+```
+
 ## Lifecycle Sequence
 
 ```mermaid
@@ -278,11 +324,26 @@ flowchart TD
 - simulation step: `1..200,000`
 - feature importance `top_n`: `1..50`
 
+## Client-Side Shell Controls
+
+The top-left icon used to collapse/expand the sticky navbar is a frontend-only interaction and does not call backend endpoints.
+
+```mermaid
+flowchart LR
+    USER["User clicks top-left nav icon"] --> UI["TopNav component state toggle"]
+    UI --> CSS["Animated collapse/expand classes"]
+    CSS --> RESULT["Navbar hidden or restored"]
+    RESULT --> API["No API request required"]
+```
+
 ## Operational Notes
 
 - `/ready` should be used by orchestration health checks.
 - `/metrics` exposes Prometheus-friendly counters and latency sums.
 - `/mlops/drift-check` depends on `training_baseline.json`; returns `503` when missing.
+- overview visual cards (now six cards above Global Country Intelligence) consume existing `GET /clusters/summary` and `GET /maps/country-metrics` data (no additional contract required).
+- model-lab insight cards (now four cards above Batch Prediction Workbench) are derived from existing simulation and feature-importance responses (no new endpoint surface).
+- Drift Snapshot remains rendered before first run and shows "run the lab" guidance while idle; skeleton placeholders are only used during active lab execution.
 
 ## Error Semantics
 

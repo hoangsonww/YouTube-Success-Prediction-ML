@@ -27,10 +27,12 @@ import {
   getCategoryPerformance,
   getClusterSummary,
   getCountryMetrics,
+  getMapEmbedUrl,
   getProcessedSample,
   getRawSample,
   getUploadGrowthBuckets,
   isOfflineFallbackModeEnabled,
+  type MapEmbedKind,
 } from "@/lib/api";
 import type {
   CategoryPerformanceRecord,
@@ -50,6 +52,24 @@ const palette = [
   "#06b6d4",
   "#84cc16",
   "#ec4899",
+];
+
+const MAP_VIEWS: Array<{ kind: MapEmbedKind; label: string; subtitle: string }> = [
+  {
+    kind: "influence-map",
+    label: "Influence",
+    subtitle: "Publisher footprint and reach intensity by location",
+  },
+  {
+    kind: "earnings-choropleth",
+    label: "Earnings",
+    subtitle: "Country heatmap by total yearly earnings",
+  },
+  {
+    kind: "category-dominance",
+    label: "Category Dominance",
+    subtitle: "Leading content category by country",
+  },
 ];
 
 function compact(value: number) {
@@ -83,6 +103,9 @@ export function ChartsPageClient() {
   const [error, setError] = useState<string | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
+  const [activeMapView, setActiveMapView] = useState<MapEmbedKind>("influence-map");
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapFrameError, setMapFrameError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -174,6 +197,56 @@ export function ChartsPageClient() {
     [clusters]
   );
 
+  const clusterMatrix = useMemo(
+    () =>
+      clusters.map((row, index) => ({
+        cluster_id: row.cluster_id,
+        archetype: row.archetype,
+        avg_uploads: Math.round(row.avg_uploads),
+        avg_growth: Math.round(row.avg_growth),
+        avg_earnings: Math.max(1, Math.round(row.avg_earnings)),
+        size: row.size,
+        fill: palette[index % palette.length],
+      })),
+    [clusters]
+  );
+
+  const mapUrl = useMemo(() => getMapEmbedUrl(activeMapView), [activeMapView]);
+
+  const activeMapConfig = useMemo(
+    () => MAP_VIEWS.find((item) => item.kind === activeMapView) ?? MAP_VIEWS[0],
+    [activeMapView]
+  );
+
+  const mapTotals = useMemo(
+    () =>
+      countries.reduce(
+        (acc, row) => {
+          acc.subscribers += row.total_subscribers;
+          acc.earnings += row.total_earnings;
+          return acc;
+        },
+        { subscribers: 0, earnings: 0 }
+      ),
+    [countries]
+  );
+
+  const mapCategoryLeaders = useMemo(() => {
+    const counts = new Map<string, number>();
+    countries.forEach((row) => {
+      counts.set(row.dominant_category, (counts.get(row.dominant_category) ?? 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+  }, [countries]);
+
+  useEffect(() => {
+    setMapLoaded(false);
+    setMapFrameError(null);
+  }, [activeMapView, offlineMode]);
+
   return (
     <AppShell
       eyebrow="Visualization Layer"
@@ -201,6 +274,91 @@ export function ChartsPageClient() {
           <div className="skeletonChart" />
         </section>
       )}
+
+      <section className="panel mapPanel">
+        <div className="panelHeader">
+          <h2>Global Intelligence Mapping</h2>
+          <span className="chip">Real World Maps</span>
+        </div>
+
+        <div className="mapControlBar">
+          <p className="mapHint">{activeMapConfig.subtitle}</p>
+          <div className="mapToggleGroup" role="tablist" aria-label="Map view">
+            {MAP_VIEWS.map((view) => (
+              <button
+                key={view.kind}
+                type="button"
+                role="tab"
+                className={
+                  activeMapView === view.kind ? "mapToggleButton active" : "mapToggleButton"
+                }
+                onClick={() => setActiveMapView(view.kind)}
+                aria-selected={activeMapView === view.kind}
+              >
+                {view.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mapFrameShell">
+          {!offlineMode && !mapFrameError && mounted ? (
+            <>
+              {!mapLoaded && (
+                <div className="mapFrameOverlay">Rendering {activeMapConfig.label} map...</div>
+              )}
+              <iframe
+                key={activeMapView}
+                title={`Global map: ${activeMapConfig.label}`}
+                src={mapUrl}
+                className="mapFrame"
+                loading="lazy"
+                onLoad={() => setMapLoaded(true)}
+                onError={() => {
+                  setMapFrameError("The map iframe failed to load from the backend.");
+                  setMapLoaded(false);
+                }}
+              />
+            </>
+          ) : (
+            <div className="chartPlaceholder">
+              {!mounted
+                ? "Preparing map..."
+                : offlineMode
+                  ? "Map rendering requires the backend API. Start it and set NEXT_PUBLIC_API_BASE_URL."
+                  : (mapFrameError ?? "Unable to load map content.")}
+            </div>
+          )}
+        </div>
+
+        <div className="mapStatsGrid">
+          <article className="mapStatCard">
+            <p>Countries covered</p>
+            <strong>{fmt(countries.length)}</strong>
+          </article>
+          <article className="mapStatCard">
+            <p>Total subscribers</p>
+            <strong>{compact(mapTotals.subscribers)}</strong>
+          </article>
+          <article className="mapStatCard">
+            <p>Total yearly earnings</p>
+            <strong>{compact(mapTotals.earnings)}</strong>
+          </article>
+          <article className="mapStatCard">
+            <p>Largest market</p>
+            <strong>{countries[0]?.country ?? "N/A"}</strong>
+          </article>
+        </div>
+
+        <div className="mapLegendRow">
+          {mapCategoryLeaders.map((item) => (
+            <span key={item.category} className="mapLegendChip">
+              <i />
+              {item.category} ({item.count})
+            </span>
+          ))}
+        </div>
+      </section>
 
       <section className="panelGrid panelGrid2">
         <article className="panel chartPanel">
@@ -395,28 +553,95 @@ export function ChartsPageClient() {
         </article>
       </section>
 
-      <section className="panel">
-        <div className="panelHeader">
-          <h2>Cluster Composition Snapshot</h2>
-          <span className="chip">Archetype Mix</span>
-        </div>
-        <div className="chartWrap">
-          {mounted ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={clusterComp} margin={{ top: 12, right: 12, left: 0, bottom: 15 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
-                <XAxis dataKey="archetype" />
-                <YAxis tickFormatter={compact} />
-                <Tooltip formatter={tooltipNumber} />
-                <Legend />
-                <Bar dataKey="size" fill="#2f6fed" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="avg_growth" fill="#14b8a6" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="chartPlaceholder">Preparing chart...</div>
-          )}
-        </div>
+      <section className="panelGrid panelGrid2">
+        <article className="panel chartPanel">
+          <div className="panelHeader">
+            <h2>Cluster Composition Snapshot</h2>
+            <span className="chip">Archetype Mix</span>
+          </div>
+          <div className="chartWrap">
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={clusterComp} margin={{ top: 12, right: 12, left: 0, bottom: 15 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
+                  <XAxis dataKey="archetype" />
+                  <YAxis tickFormatter={compact} />
+                  <Tooltip formatter={tooltipNumber} />
+                  <Legend />
+                  <Bar dataKey="size" fill="#2f6fed" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="avg_growth" fill="#14b8a6" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            )}
+          </div>
+        </article>
+
+        <article className="panel chartPanel">
+          <div className="panelHeader">
+            <h2>Cluster Strategy Matrix</h2>
+            <span className="chip">Bubble Cluster View</span>
+          </div>
+          <div className="chartWrap">
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <ScatterChart margin={{ top: 10, right: 16, left: 0, bottom: 12 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
+                  <XAxis
+                    type="number"
+                    dataKey="avg_uploads"
+                    name="avg_uploads"
+                    tickFormatter={compact}
+                  />
+                  <YAxis
+                    type="number"
+                    dataKey="avg_growth"
+                    name="avg_growth"
+                    tickFormatter={compact}
+                  />
+                  <ZAxis
+                    type="number"
+                    dataKey="avg_earnings"
+                    name="avg_earnings"
+                    range={[120, 620]}
+                  />
+                  <Tooltip
+                    cursor={{ strokeDasharray: "3 3" }}
+                    content={({ active, payload }) => {
+                      if (!active || !payload || payload.length === 0) {
+                        return null;
+                      }
+                      const point = payload[0]?.payload as
+                        | (typeof clusterMatrix)[number]
+                        | undefined;
+                      if (!point) {
+                        return null;
+                      }
+                      return (
+                        <div className="clusterTooltip">
+                          <strong>{point.archetype}</strong>
+                          <p>Cluster: {point.cluster_id}</p>
+                          <p>Avg uploads: {fmt(point.avg_uploads)}</p>
+                          <p>Avg growth: {fmt(point.avg_growth)}</p>
+                          <p>Avg earnings: {fmt(point.avg_earnings)}</p>
+                          <p>Members: {fmt(point.size)}</p>
+                        </div>
+                      );
+                    }}
+                  />
+                  <Scatter data={clusterMatrix} fill="#2f6fed" fillOpacity={0.85}>
+                    {clusterMatrix.map((row) => (
+                      <Cell key={`cluster-matrix-${row.cluster_id}`} fill={row.fill} />
+                    ))}
+                  </Scatter>
+                </ScatterChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            )}
+          </div>
+        </article>
       </section>
 
       <section className="panelGrid panelGrid2">

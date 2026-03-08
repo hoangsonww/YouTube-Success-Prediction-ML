@@ -12,3 +12,5 @@ Port-forward:
 kubectl -n yts-monitoring port-forward svc/prometheus 9090:9090
 kubectl -n yts-monitoring port-forward svc/grafana 3001:3000
 ```
+
+Recommended dashboards/alerts should include request health for `/ready`, `/maps/*`, and `/mlops/drift-check` to protect map and lab visual reliability.

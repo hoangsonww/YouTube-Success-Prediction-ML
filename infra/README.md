@@ -17,7 +17,7 @@ This directory contains the production infrastructure and delivery stack for You
 | --- | --- |
 | Document role | Infrastructure stack index and command entrypoint |
 | Primary audience | Platform engineers and cloud operators |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Coverage | Kubernetes, Argo CD, Terraform cloud packs |
 | Operational scope | Multi-cloud production infrastructure |
 
@@ -103,4 +103,26 @@ Monitoring stack:
 ```bash
 docker compose -f docker-compose.monitoring.yml up -d
 kubectl apply -k infra/k8s/monitoring
+```
+
+Post-deploy API/UI verification:
+
+```bash
+curl -sS http://127.0.0.1:8000/health
+curl -sS http://127.0.0.1:8000/ready
+curl -sS http://127.0.0.1:8000/maps/influence-map >/dev/null
+curl -sS http://127.0.0.1:8000/maps/earnings-choropleth >/dev/null
+curl -sS http://127.0.0.1:8000/maps/category-dominance >/dev/null
+```
+
+Then validate frontend shell behavior:
+
+- top-left icon toggles animated collapse/expand of sticky navbar
+- model lab drift panel shows run-lab guidance when idle (not endless loading skeleton)
+
+```mermaid
+flowchart LR
+    Infra["Terraform + K8s + Argo"] --> API["Health + Ready + Map endpoints"]
+    API --> FE["Overview (6 cards) + Lab (4 cards)"]
+    FE --> Ops["Release accepted"]
 ```

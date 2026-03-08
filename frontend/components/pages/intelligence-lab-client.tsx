@@ -2,9 +2,12 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
@@ -65,6 +68,10 @@ const COMMON_COUNTRIES = [
 
 function tooltipNumber(value: unknown) {
   return number.format(Number(value ?? 0));
+}
+
+function tooltipCurrency(value: unknown) {
+  return currency.format(Number(value ?? 0));
 }
 
 function tooltipFixed(value: unknown) {
@@ -176,6 +183,7 @@ export function IntelligenceLabClient() {
   const [batchResult, setBatchResult] = useState<BatchPredictionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [labLoading, setLabLoading] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
@@ -208,6 +216,64 @@ export function IntelligenceLabClient() {
         .slice(0, 10) ?? [],
     [importance]
   );
+
+  const growthPulse = useMemo(
+    () =>
+      growthSeries.map((point, index) => ({
+        uploads: point.uploads,
+        growth: point.growth,
+        change: index === 0 ? 0 : point.growth - growthSeries[index - 1].growth,
+      })),
+    [growthSeries]
+  );
+
+  const growthSwing = useMemo(() => {
+    if (growthSeries.length === 0) {
+      return 0;
+    }
+    const values = growthSeries.map((point) => point.growth);
+    return Math.max(...values) - Math.min(...values);
+  }, [growthSeries]);
+
+  const explainabilityPulse = useMemo(() => importanceSeries.slice(0, 6), [importanceSeries]);
+
+  const explainabilityCoverage = useMemo(() => {
+    if (importanceSeries.length === 0) {
+      return 0;
+    }
+    const total = importanceSeries.reduce((acc, item) => acc + item.importance, 0);
+    if (total <= 0) {
+      return 0;
+    }
+    const topThree = importanceSeries.slice(0, 3).reduce((acc, item) => acc + item.importance, 0);
+    return (topThree / total) * 100;
+  }, [importanceSeries]);
+  const earningsResponseSeries = useMemo(
+    () =>
+      growthSeries.map((point, index) => ({
+        uploads: point.uploads,
+        earnings: point.earnings,
+        earnings_per_upload: point.uploads > 0 ? point.earnings / point.uploads : 0,
+        growth_delta: index === 0 ? 0 : point.growth - growthSeries[index - 1].growth,
+      })),
+    [growthSeries]
+  );
+  const driftSeverityMix = useMemo(() => {
+    const counts = new Map<string, number>([
+      ["low", 0],
+      ["medium", 0],
+      ["high", 0],
+    ]);
+    drift?.records.forEach((row) => {
+      const key = row.severity.toLowerCase();
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+    return Array.from(counts.entries()).map(([severity, count]) => ({
+      severity: titleCase(severity),
+      count,
+      fill: severity === "high" ? "#ef4444" : severity === "medium" ? "#f59e0b" : "#14b8a6",
+    }));
+  }, [drift]);
 
   const batchValidation = useMemo(() => {
     const trimmed = batchText.trim();
@@ -301,6 +367,7 @@ export function IntelligenceLabClient() {
   async function runSimulationAndRecommendation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
+    setLabLoading(true);
     setError(null);
 
     try {
@@ -330,6 +397,7 @@ export function IntelligenceLabClient() {
       setError(err instanceof Error ? err.message : "Failed to run intelligence workflows.");
     } finally {
       setLoading(false);
+      setLabLoading(false);
     }
   }
 
@@ -466,7 +534,13 @@ export function IntelligenceLabClient() {
           </div>
 
           <div className="chartWrap">
-            {mounted ? (
+            {!mounted ? (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            ) : growthSeries.length === 0 ? (
+              <div className="chartPlaceholder">
+                Run the lab to generate the growth curve visualization.
+              </div>
+            ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={growthSeries} margin={{ top: 12, right: 12, left: 0, bottom: 16 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
@@ -495,13 +569,17 @@ export function IntelligenceLabClient() {
                   />
                 </LineChart>
               </ResponsiveContainer>
-            ) : (
-              <div className="chartPlaceholder">Preparing chart...</div>
             )}
           </div>
 
           <div className="chartWrap">
-            {mounted ? (
+            {!mounted ? (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            ) : importanceSeries.length === 0 ? (
+              <div className="chartPlaceholder">
+                Run the lab to generate explainability feature importance.
+              </div>
+            ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   layout="vertical"
@@ -526,47 +604,252 @@ export function IntelligenceLabClient() {
                   <Bar dataKey="importance" fill="#2f6fed" radius={[0, 7, 7, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            ) : (
-              <div className="chartPlaceholder">Preparing chart...</div>
             )}
           </div>
         </article>
       </section>
 
-      {drift && (
-        <section className="panel">
-          <div className="panelHeader">
-            <h2>Drift Snapshot</h2>
-            <span className="chip">Runtime Risk</span>
-          </div>
+      <section className="panel">
+        <div className="panelHeader">
+          <h2>Drift Snapshot</h2>
+          <span className="chip">Runtime Risk</span>
+        </div>
 
+        {drift ? (
           <p className="mutedText">
             Drift risk: <strong>{String(drift.summary.is_drift_risk)}</strong> | High severity
             records: <strong>{drift.summary.high_severity_records}</strong>
           </p>
+        ) : labLoading ? (
+          <p className="mutedText">
+            Drift risk: <span className="skeletonText skeletonMd" aria-hidden="true" /> | High
+            severity records: <span className="skeletonText skeletonMd" aria-hidden="true" />
+          </p>
+        ) : (
+          <p className="mutedText">Run the lab to generate drift snapshot metrics.</p>
+        )}
 
-          <div className="tableShell">
-            <table>
-              <thead>
-                <tr>
-                  <th>Index</th>
-                  <th>Severity</th>
-                  <th>Warnings</th>
-                </tr>
-              </thead>
-              <tbody>
-                {drift.records.map((row) => (
+        <div className="tableShell">
+          <table>
+            <thead>
+              <tr>
+                <th>Index</th>
+                <th>Severity</th>
+                <th>Warnings</th>
+              </tr>
+            </thead>
+            <tbody>
+              {drift ? (
+                drift.records.map((row) => (
                   <tr key={row.index}>
                     <td>{row.index}</td>
                     <td>{row.severity}</td>
                     <td>{row.warnings.join("; ") || "None"}</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                ))
+              ) : labLoading ? (
+                Array.from({ length: 4 }).map((_, idx) => (
+                  <tr key={`drift-skeleton-${idx}`}>
+                    <td colSpan={3}>
+                      <div className="skeletonRow" />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="mutedText">
+                    Run the lab to generate drift records.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="panelGrid panelGrid2">
+        <article className="panel chartPanel">
+          <div className="panelHeader">
+            <h2>Growth Elasticity Pulse</h2>
+            <span className="chip">Insight Card</span>
           </div>
-        </section>
-      )}
+          <p className="mutedText">
+            Swing across tested upload range: <strong>{number.format(growthSwing)}</strong>
+          </p>
+          <div className="chartWrap">
+            {!mounted ? (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            ) : growthPulse.length === 0 ? (
+              <div className="chartPlaceholder">
+                Run the lab to generate the growth elasticity pulse.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={growthPulse} margin={{ top: 10, right: 12, left: 0, bottom: 10 }}>
+                  <defs>
+                    <linearGradient id="growthPulseFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2f6fed" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#2f6fed" stopOpacity={0.04} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
+                  <XAxis dataKey="uploads" />
+                  <YAxis tickFormatter={(v) => number.format(Number(v ?? 0))} />
+                  <Tooltip formatter={tooltipNumber} />
+                  <Area
+                    type="monotone"
+                    dataKey="growth"
+                    stroke="#2f6fed"
+                    fill="url(#growthPulseFill)"
+                    strokeWidth={2.5}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </article>
+
+        <article className="panel chartPanel">
+          <div className="panelHeader">
+            <h2>Explainability Concentration</h2>
+            <span className="chip">Feature Pulse</span>
+          </div>
+          <p className="mutedText">
+            Top-3 features explain <strong>{explainabilityCoverage.toFixed(1)}%</strong> of shown
+            importance.
+          </p>
+          <div className="chartWrap">
+            {!mounted ? (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            ) : explainabilityPulse.length === 0 ? (
+              <div className="chartPlaceholder">
+                Run the lab to generate explainability concentration insights.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={explainabilityPulse}
+                  margin={{ top: 10, right: 12, left: 0, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
+                  <XAxis
+                    dataKey="shortLabel"
+                    interval={0}
+                    angle={-18}
+                    textAnchor="end"
+                    height={54}
+                  />
+                  <YAxis />
+                  <Tooltip
+                    formatter={tooltipFixed}
+                    labelFormatter={(label, payload) =>
+                      String(payload?.[0]?.payload?.feature ?? label ?? "")
+                    }
+                  />
+                  <Bar dataKey="importance" fill="#14b8a6" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </article>
+      </section>
+
+      <section className="panelGrid panelGrid2">
+        <article className="panel chartPanel">
+          <div className="panelHeader">
+            <h2>Earnings Response Gradient</h2>
+            <span className="chip">Monetization Elasticity</span>
+          </div>
+          <div className="chartWrap">
+            {!mounted ? (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            ) : earningsResponseSeries.length === 0 ? (
+              <div className="chartPlaceholder">
+                Run the lab to generate earnings response intelligence.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={earningsResponseSeries}
+                  margin={{ top: 10, right: 12, left: 0, bottom: 10 }}
+                >
+                  <defs>
+                    <linearGradient id="earningsResponseFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
+                  <XAxis dataKey="uploads" />
+                  <YAxis yAxisId="left" tickFormatter={tooltipCurrency} />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tickFormatter={(v) => Number(v ?? 0).toFixed(2)}
+                  />
+                  <Tooltip
+                    formatter={(value, name) => [
+                      name === "earnings" ? tooltipCurrency(value) : Number(value ?? 0).toFixed(2),
+                      String(name ?? ""),
+                    ]}
+                  />
+                  <Legend />
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="earnings"
+                    stroke="#14b8a6"
+                    fill="url(#earningsResponseFill)"
+                    strokeWidth={2.4}
+                  />
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="earnings_per_upload"
+                    stroke="#2f6fed"
+                    strokeWidth={2.2}
+                    dot={{ r: 3 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </article>
+
+        <article className="panel chartPanel">
+          <div className="panelHeader">
+            <h2>Drift Severity Mix</h2>
+            <span className="chip">Low / Medium / High</span>
+          </div>
+          <div className="chartWrap">
+            {!mounted ? (
+              <div className="chartPlaceholder">Preparing chart...</div>
+            ) : !drift ? (
+              <div className="chartPlaceholder">
+                Run the lab to generate drift severity distribution.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={driftSeverityMix}
+                  margin={{ top: 10, right: 12, left: 0, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbe5ff" />
+                  <XAxis dataKey="severity" />
+                  <YAxis tickFormatter={tooltipNumber} />
+                  <Tooltip formatter={tooltipNumber} />
+                  <Legend />
+                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                    {driftSeverityMix.map((entry) => (
+                      <Cell key={`drift-${entry.severity}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </article>
+      </section>
 
       <section className="panel">
         <div className="panelHeader">
