@@ -15,7 +15,12 @@ from youtube_success_ml.schemas import (
     SimulationRequest,
 )
 from youtube_success_ml.services.intelligence_service import IntelligenceService
-from youtube_success_ml.visualization.maps import build_country_metrics
+from youtube_success_ml.visualization.maps import (
+    build_category_dominance_map_html,
+    build_country_metrics,
+    build_earnings_choropleth_html,
+    build_influence_map_html,
+)
 
 app = Flask(__name__)
 
@@ -115,6 +120,24 @@ def clusters():
 def map_metrics():
     df = load_dataset()
     return jsonify({"records": build_country_metrics(df)})
+
+
+@app.get("/maps/influence-map")
+def map_influence():
+    df = load_dataset()
+    return build_influence_map_html(df), 200, {"Content-Type": "text/html; charset=utf-8"}
+
+
+@app.get("/maps/earnings-choropleth")
+def map_earnings_choropleth():
+    df = load_dataset()
+    return build_earnings_choropleth_html(df), 200, {"Content-Type": "text/html; charset=utf-8"}
+
+
+@app.get("/maps/category-dominance")
+def map_category_dominance():
+    df = load_dataset()
+    return build_category_dominance_map_html(df), 200, {"Content-Type": "text/html; charset=utf-8"}
 
 
 @app.get("/data/raw-sample")

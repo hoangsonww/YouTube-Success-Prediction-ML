@@ -27,3 +27,4 @@ kubectl apply -k infra/k8s/monitoring
 
 - Prometheus scrapes `GET /metrics` from the API service.
 - Dashboard is provisioned automatically from `grafana/dashboards`.
+- Track frontend-critical API reliability (`/ready`, `/maps/*`, `/mlops/drift-check`) because overview/lab visual cards depend on these surfaces.

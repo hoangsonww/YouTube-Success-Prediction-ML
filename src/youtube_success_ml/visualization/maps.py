@@ -14,6 +14,65 @@ except Exception:  # noqa: BLE001
     folium = None
 
 
+def _wrap_embed_html(body_html: str, title: str) -> str:
+    safe_title = title.replace("<", "").replace(">", "")
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{safe_title}</title>
+  <style>
+    html, body {{
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }}
+    .map-wrap {{
+      width: 100%;
+      height: 100%;
+    }}
+    .map-wrap > div,
+    .folium-map {{
+      width: 100% !important;
+      height: 100% !important;
+    }}
+  </style>
+</head>
+<body>
+  <div class="map-wrap">{body_html}</div>
+</body>
+</html>"""
+
+
+def build_influence_map_html(df: pd.DataFrame) -> str:
+    fig = build_influence_map(df)
+    fig.update_layout(margin=dict(l=0, r=0, t=48, b=0))
+    html = fig.to_html(include_plotlyjs="cdn", full_html=False, config={"responsive": True})
+    return _wrap_embed_html(html, "Global YouTube Influence Map")
+
+
+def build_earnings_choropleth_html(df: pd.DataFrame) -> str:
+    fig = build_earnings_choropleth(df)
+    fig.update_layout(margin=dict(l=0, r=0, t=48, b=0))
+    html = fig.to_html(include_plotlyjs="cdn", full_html=False, config={"responsive": True})
+    return _wrap_embed_html(html, "Yearly Earnings by Country")
+
+
+def build_category_dominance_map_html(df: pd.DataFrame) -> str:
+    fmap_or_fig = build_category_dominance_map(df)
+    if folium is not None and hasattr(fmap_or_fig, "get_root"):
+        html = fmap_or_fig.get_root().render()
+        return _wrap_embed_html(html, "Category Dominance by Country")
+
+    fmap_or_fig.update_layout(margin=dict(l=0, r=0, t=48, b=0))
+    html = fmap_or_fig.to_html(include_plotlyjs="cdn", full_html=False, config={"responsive": True})
+    return _wrap_embed_html(html, "Category Dominance by Country")
+
+
 def build_influence_map(df: pd.DataFrame):
     geo = df.dropna(subset=["latitude", "longitude"]).copy()
     geo = geo[geo["country"] != "Unknown"]
@@ -50,12 +109,15 @@ def build_earnings_choropleth(df: pd.DataFrame):
 
     fig = px.choropleth(
         agg,
-        locations="abbreviation",
+        locations="country",
+        locationmode="country names",
         color="total_earnings",
         hover_name="country",
+        hover_data={"abbreviation": True, "total_earnings": ":,.0f"},
         color_continuous_scale="Blues",
         title="Yearly Earnings by Country",
     )
+    fig.update_geos(showcoastlines=True, coastlinecolor="#9fb7de")
     return fig
 
 
@@ -114,6 +176,10 @@ def build_country_metrics(df: pd.DataFrame) -> list[dict[str, Any]]:
         .agg(
             total_subscribers=("subscribers", "sum"),
             total_earnings=("highest_yearly_earnings", "sum"),
+            channel_count=("youtuber", "count"),
+            avg_growth=("growth_target", "mean"),
+            latitude=("latitude", "median"),
+            longitude=("longitude", "median"),
         )
     )
 
@@ -128,7 +194,13 @@ def build_country_metrics(df: pd.DataFrame) -> list[dict[str, Any]]:
 
     merged = grouped.merge(dominant, on="country", how="left")
     merged = merged.sort_values("total_subscribers", ascending=False)
-    return merged.to_dict(orient="records")
+    records = merged.to_dict(orient="records")
+    for row in records:
+        latitude = row.get("latitude")
+        longitude = row.get("longitude")
+        row["latitude"] = float(latitude) if pd.notna(latitude) else None
+        row["longitude"] = float(longitude) if pd.notna(longitude) else None
+    return records
 
 
 def export_map_assets(df: pd.DataFrame, output_dir: Path | None = None) -> dict[str, Path]:

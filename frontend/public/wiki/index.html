@@ -267,6 +267,8 @@
             <ul>
               <li>Single and batch inference</li>
               <li>Simulation and recommendation endpoints</li>
+              <li>Model lab with four insight cards plus always-visible drift snapshot</li>
+              <li>Icon-only top-left control for animated navbar collapse/expand</li>
               <li>FastAPI + Flask compatibility</li>
             </ul>
           </article>
@@ -296,6 +298,7 @@
             </p>
             <ul>
               <li>Country metrics APIs</li>
+              <li>Real world map tabs (influence, earnings choropleth, category dominance)</li>
               <li>Charts page with post-processed views</li>
               <li>Plotly/Folium map artifacts</li>
             </ul>
@@ -392,9 +395,60 @@ flowchart LR
   APP --> CHARTS["Route: /visualizations/charts"]
   APP --> LAB["Route: /intelligence/lab"]
   APP --> WIKI["Route: /wiki"]
-  HOME --> PREDICT["Prediction workflows"]
-  CHARTS --> ANALYTICS["Post-processing charts"]
-  LAB --> EXPLAIN["Simulation and explainability"]
+  HOME --> PREDICT["Prediction workflows + 6 intelligence cards"]
+  CHARTS --> ANALYTICS["Real map workspace + post-processing charts"]
+  LAB --> EXPLAIN["Simulation and explainability + 4 insight cards"]
+  LAB --> DRIFT["Always-visible Drift Snapshot (run-lab guidance when idle)"]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="overview cards momentum archetype efficiency category pressure market share lift"
+          >
+            <h3>Overview Intelligence Card Stack</h3>
+            <pre class="mermaid">
+flowchart TB
+  HOME["Route: /"] --> C1["Market Momentum Lens"]
+  HOME --> C2["Archetype Share Wheel"]
+  HOME --> C3["Revenue Efficiency Signals"]
+  HOME --> C4["Category Pressure Map"]
+  HOME --> C5["Market Share Balance"]
+  HOME --> C6["Monetization Lift Curve"]
+  C1 --> TABLE["Global Country Intelligence"]
+  C6 --> TABLE
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="intelligence lab cards growth explainability earnings drift severity empty state batch workbench"
+          >
+            <h3>Model Lab Insight Card Stack</h3>
+            <pre class="mermaid">
+flowchart TB
+  LAB["Route: /intelligence/lab"] --> L1["Growth Elasticity Pulse"]
+  LAB --> L2["Explainability Concentration"]
+  LAB --> L3["Earnings Response Gradient"]
+  LAB --> L4["Drift Severity Mix"]
+  LAB --> DS["Drift Snapshot (always rendered, run-lab text when idle)"]
+  LAB --> BW["Batch Prediction Workbench"]
+  LAB --> EMPTY["Growth/Explainability + Drift: run-lab text before first run"]
+            </pre>
+          </article>
+
+          <article
+            class="chart-card reveal searchable"
+            data-search="navbar interaction top-left icon hide show collapse expand animation"
+          >
+            <h3>Navigation Shell Interaction</h3>
+            <pre class="mermaid">
+stateDiagram-v2
+  [*] --> Expanded
+  Expanded --> Collapsed: top-left icon click
+  Collapsed --> Expanded: top-left icon click
+  Expanded --> MobileMenuOpen: mobile Menu tap
+  MobileMenuOpen --> Expanded: close/menu tap or route change
             </pre>
           </article>
 
@@ -959,7 +1013,7 @@ terraform apply</code></pre>
           data-search="release checklist production readiness"
         >
           <h3>Release Checklist</h3>
-          <p class="checklist-meta"><strong id="checklist-progress">0/8</strong> completed</p>
+          <p class="checklist-meta"><strong id="checklist-progress">0/11</strong> completed</p>
           <div class="checklist-items">
             <label
               ><input type="checkbox" data-check-item="train" /> Training run completed
@@ -981,6 +1035,18 @@ terraform apply</code></pre>
             <label
               ><input type="checkbox" data-check-item="probes" /> `/health` and `/ready`
               validated</label
+            >
+            <label
+              ><input type="checkbox" data-check-item="overviewCards" /> Overview route shows 6
+              cards above Global Country Intelligence</label
+            >
+            <label
+              ><input type="checkbox" data-check-item="labCards" /> Intelligence lab shows 4 cards
+              above Batch Prediction Workbench plus visible Drift Snapshot</label
+            >
+            <label
+              ><input type="checkbox" data-check-item="navToggle" /> Top-left icon hides and
+              re-expands sticky navbar with animation</label
             >
             <label
               ><input type="checkbox" data-check-item="rollback" /> Rollback path tested in

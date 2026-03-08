@@ -30,8 +30,8 @@ Below is the MLOps guide for the YouTube Success Prediction ML Platform, detaili
 | --- | --- |
 | Document role | MLOps lifecycle, governance, and operational controls |
 | Primary audience | ML engineers, MLOps engineers, reliability engineers |
-| Last updated | February 18, 2026 |
-| Artifact roots | `artifacts/models`, `artifacts/reports`, `artifacts/mlops` |
+| Last updated | March 8, 2026 |
+| Artifact roots | `artifacts/models`, `artifacts/reports`, `artifacts/mlops`, `artifacts/maps` |
 | Control owner | ML platform governance |
 
 ## Documentation Map
@@ -104,6 +104,15 @@ Generated files:
 - `artifacts/reports/feature_store_snapshot.csv`
 - `artifacts/mlops/training_manifest.json`
 - `artifacts/mlops/model_registry.json`
+- `artifacts/maps/influence_map.html`
+- `artifacts/maps/earnings_choropleth.html`
+- `artifacts/maps/category_dominance_map.html`
+
+Map serving relevance:
+
+- runtime APIs expose iframe-ready map HTML endpoints (`/maps/influence-map`, `/maps/earnings-choropleth`, `/maps/category-dominance`)
+- these endpoints are generated from current processed dataset state and should be validated in API contract tests
+- newest overview/intelligence-lab visual cards consume existing model outputs and analytics aggregates; no new MLOps artifact types are introduced
 
 ## Manifest + Registry
 
@@ -293,6 +302,16 @@ flowchart TD
     C --> E[Record Severity]
     D --> E
     E --> F[Summary Risk Flag]
+```
+
+Frontend drift-consumption path:
+
+```mermaid
+flowchart LR
+    LAB["Model Lab UI"] --> DRIFT["POST /mlops/drift-check"]
+    DRIFT --> SUMMARY["Drift Snapshot summary + records"]
+    SUMMARY --> CARD1["Always-visible Drift Snapshot (run-lab guidance when idle)"]
+    SUMMARY --> CARD2["Drift Severity Mix chart"]
 ```
 
 ## Training And Registry Update Sequence

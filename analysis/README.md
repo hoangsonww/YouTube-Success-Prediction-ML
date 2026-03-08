@@ -2,6 +2,8 @@
 
 This directory contains production-style data exploration and EDA assets.
 
+Last updated: March 8, 2026.
+
 Dataset source: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com/datasets/nelgiriyewithana/global-youtube-statistics-2023?resource=download) (local file used in this repo: `data/Global YouTube Statistics.csv`).
 
 ## Layout
@@ -31,6 +33,19 @@ Dataset source: [Kaggle - Global YouTube Statistics 2023](https://www.kaggle.com
 - Notebooks are intentionally modular: each notebook has a single primary objective.
 - CLI scripts remain the source of truth for repeatable CI-safe EDA/export tasks.
 - Use notebooks for investigation and interpretation; use scripts for deterministic artifact generation.
+- Outputs from notebook/script analysis feed map artifacts and country/cluster aggregates that power overview and visualizations routes in the frontend.
+
+## Analysis To Product Surface
+
+```mermaid
+flowchart LR
+    N1["01-06 analysis notebooks"] --> TRAIN["train.py artifacts"]
+    N2["07_global_intelligence_maps.ipynb"] --> MAPS["artifacts/maps/*.html"]
+    TRAIN --> API["/maps/country-metrics + /clusters/summary"]
+    MAPS --> API2["/maps/* html endpoints"]
+    API --> FE["Overview + Lab intelligence cards"]
+    API2 --> FE2["Charts map workspace"]
+```
 
 ## Run EDA
 

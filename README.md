@@ -102,7 +102,7 @@ This document serves as the operational and product engineering entrypoint for t
 | --- | --- |
 | Document role | Operational and product engineering entrypoint |
 | Primary audience | ML engineers, backend engineers, frontend engineers, DevOps/platform engineers |
-| Last updated | February 18, 2026 |
+| Last updated | March 8, 2026 |
 | Canonical architecture reference | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 | Canonical API contract reference | [`API_REFERENCE.md`](API_REFERENCE.md) |
 
@@ -227,6 +227,7 @@ The platform implements the following core capabilities:
 ### 3) Global Data Visualization Support
 
 - Country-level metrics endpoint for frontend visualization.
+- Runtime map embed endpoints for frontend world-map rendering.
 - Map asset generation during training:
   - influence map
   - earnings choropleth
@@ -244,11 +245,29 @@ The platform implements the following core capabilities:
   - prediction workflow
   - cluster summary
   - country intelligence table
-  - dedicated `/visualizations/charts` route with raw vs processed data presentation
-  - dedicated `/intelligence/lab` route for advanced model operations and drift-aware analysis
+  - expanded overview intelligence visuals above Global Country Intelligence:
+    - market momentum lens
+    - archetype share wheel
+    - revenue efficiency signals
+    - category pressure map
+    - market share balance
+    - monetization lift curve
+  - dedicated `/visualizations/charts` route with real map tabs, cluster strategy visuals, and raw vs processed data presentation
+  - dedicated `/intelligence/lab` route for advanced model operations and expanded insight visuals above batch workbench:
+    - growth elasticity pulse
+    - explainability concentration
+    - earnings response gradient
+    - drift severity mix
+  - growth/explainability cards now show explicit "run the lab" empty-state guidance when no run data is available
+  - Drift Snapshot always renders with explicit "run the lab" guidance when idle, and loading skeletons only while the lab run is actively executing
+  - icon-only top-left navbar control supports animated collapse/expand of the sticky top nav
 
 <p align="center">
   <img src="images/overview.png" alt="Platform Overview" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/overview-2.png" alt="Home Mockup" width="100%">
 </p>
 
 <p align="center">
@@ -583,7 +602,20 @@ Returns cluster-level aggregates and archetype names.
 
 - `GET /maps/country-metrics`
 
-Returns country records with total subscribers, earnings, and dominant category.
+Returns country records with:
+
+- total subscribers
+- total earnings
+- dominant category
+- channel count
+- average growth
+- latitude/longitude
+
+Map HTML endpoints:
+
+- `GET /maps/influence-map`
+- `GET /maps/earnings-choropleth`
+- `GET /maps/category-dominance`
 
 ### Data Samples (Raw vs Processed)
 
@@ -611,23 +643,64 @@ Routes:
 
 - `/`
   - prediction form
+  - market momentum lens card
+  - archetype share wheel card
+  - revenue efficiency signals card
+  - category pressure map card
+  - market share balance card
+  - monetization lift curve card
   - cluster summary table
   - country metrics table
 - `/visualizations/charts`
+  - real map workspace with influence/earnings/category views
   - chart-driven analytics
+  - cluster strategy matrix (bubble view) + archetype composition
   - raw data sample table
   - post-processed data sample table
 - `/intelligence/lab`
   - what-if simulator
   - recommendation engine view
-  - feature importance table
+  - growth curve and explainability charts
+  - growth elasticity pulse card
+  - explainability concentration card
+  - earnings response gradient card
+  - drift severity mix card
+  - empty-state guidance to run the lab before chart data is available
   - batch inference workbench
-  - drift risk snapshot
+  - drift snapshot always visible with run-lab guidance when idle (loading skeleton only during active run)
 - `/wiki`
   - embedded project wiki in app shell
   - architecture and operations reference landing page
 - `/wiki/index.html`
   - standalone static wiki build
+
+Navigation shell behavior:
+
+- icon-only control at top-left toggles top nav collapse/expand
+- collapse/expand uses animated transitions and preserves mobile menu behavior
+
+Frontend visual data mapping:
+
+```mermaid
+flowchart LR
+    CM["GET /maps/country-metrics"] --> O1["Overview: momentum + efficiency + share cards"]
+    CS["GET /clusters/summary"] --> O2["Overview: archetype wheel + category pressure"]
+    SIM["POST /predict/simulate"] --> L1["Lab: growth curve + elasticity + earnings response"]
+    FI["GET /predict/feature-importance"] --> L2["Lab: explainability charts"]
+    DRIFT["POST /mlops/drift-check"] --> L3["Lab: drift snapshot + severity mix"]
+```
+
+Frontend shell interaction mapping:
+
+```mermaid
+stateDiagram-v2
+    [*] --> NavExpanded
+    NavExpanded --> NavCollapsed: icon toggle click
+    NavCollapsed --> NavExpanded: icon toggle click
+    NavExpanded --> MenuOpen: mobile menu tap
+    MenuOpen --> NavExpanded: route change or close tap
+    NavCollapsed --> NavCollapsed: page navigation
+```
 
 ## MLOps And Governance
 
@@ -640,6 +713,9 @@ Routes:
 - `artifacts/reports/data_quality_report.json`
 - `artifacts/reports/training_baseline.json`
 - `artifacts/reports/feature_store_snapshot.csv`
+- `artifacts/maps/influence_map.html`
+- `artifacts/maps/earnings_choropleth.html`
+- `artifacts/maps/category_dominance_map.html`
 - `artifacts/mlops/training_manifest.json`
 - `artifacts/mlops/model_registry.json`
 

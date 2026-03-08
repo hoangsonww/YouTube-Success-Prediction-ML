@@ -175,6 +175,25 @@ def test_fastapi_analytics_endpoints_contract():
     assert len(upload_buckets.json()["records"]) >= 3
 
 
+def test_fastapi_map_embed_endpoints_contract():
+    _ensure_artifacts()
+
+    from youtube_success_ml.api.fastapi_app import app
+
+    client = TestClient(app)
+    influence = client.get("/maps/influence-map")
+    earnings = client.get("/maps/earnings-choropleth")
+    dominance = client.get("/maps/category-dominance")
+
+    assert influence.status_code == 200
+    assert earnings.status_code == 200
+    assert dominance.status_code == 200
+    assert "text/html" in influence.headers["content-type"]
+    assert "<html" in influence.text.lower()
+    assert "<html" in earnings.text.lower()
+    assert "<html" in dominance.text.lower()
+
+
 def test_flask_predict_contract():
     _ensure_artifacts()
 
@@ -218,3 +237,10 @@ def test_flask_advanced_contracts():
     fi = client.get("/predict/feature-importance?target=subscribers&top_n=5")
     assert fi.status_code == 200
     assert len(fi.get_json()["records"]) == 5
+
+    influence = client.get("/maps/influence-map")
+    earnings = client.get("/maps/earnings-choropleth")
+    dominance = client.get("/maps/category-dominance")
+    assert influence.status_code == 200
+    assert earnings.status_code == 200
+    assert dominance.status_code == 200
