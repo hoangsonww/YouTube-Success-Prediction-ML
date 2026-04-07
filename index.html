@@ -901,55 +901,91 @@ flowchart LR
         <div class="runbook-grid">
           <article class="runbook-card reveal searchable" data-search="local bootstrap train test">
             <h3>Local ML + API Bootstrap</h3>
-            <pre id="cmd-local"><code>source .venv/bin/activate
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+                <button class="copy-btn" data-copy-target="cmd-local" type="button">Copy</button>
+              </div>
+              <pre id="cmd-local"><code>source .venv/bin/activate
 PYTHONPATH=src python -m youtube_success_ml.train --run-all
 PYTHONPATH=src pytest -q
 PYTHONPATH=src uvicorn youtube_success_ml.api.fastapi_app:app --host 0.0.0.0 --port 8000</code></pre>
-            <button class="copy-btn" data-copy-target="cmd-local" type="button">Copy</button>
+            </div>
           </article>
           <article class="runbook-card reveal searchable" data-search="frontend dev build lint">
             <h3>Frontend Lifecycle</h3>
-            <pre id="cmd-frontend"><code>cd frontend
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+                <button class="copy-btn" data-copy-target="cmd-frontend" type="button">Copy</button>
+              </div>
+              <pre id="cmd-frontend"><code>cd frontend
 npm ci
 npm run lint
 npm run build
 npm run dev</code></pre>
-            <button class="copy-btn" data-copy-target="cmd-frontend" type="button">Copy</button>
+            </div>
           </article>
           <article
             class="runbook-card reveal searchable"
             data-search="kubernetes render validate overlays"
           >
             <h3>Kubernetes Render Checks</h3>
-            <pre id="cmd-k8s"><code>kubectl kustomize infra/k8s/overlays/rolling
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+                <button class="copy-btn" data-copy-target="cmd-k8s" type="button">Copy</button>
+              </div>
+              <pre id="cmd-k8s"><code>kubectl kustomize infra/k8s/overlays/rolling
 kubectl kustomize infra/k8s/overlays/canary
 kubectl kustomize infra/k8s/overlays/bluegreen</code></pre>
-            <button class="copy-btn" data-copy-target="cmd-k8s" type="button">Copy</button>
+            </div>
           </article>
           <article class="runbook-card reveal searchable" data-search="argo strategy switching">
             <h3>Argo Strategy Switching</h3>
-            <pre id="cmd-argo"><code>bash infra/argocd/bootstrap.sh
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+                <button class="copy-btn" data-copy-target="cmd-argo" type="button">Copy</button>
+              </div>
+              <pre id="cmd-argo"><code>bash infra/argocd/bootstrap.sh
 bash infra/argocd/switch-strategy.sh canary
 bash infra/argocd/switch-strategy.sh bluegreen
 bash infra/argocd/switch-strategy.sh rolling</code></pre>
-            <button class="copy-btn" data-copy-target="cmd-argo" type="button">Copy</button>
+            </div>
           </article>
           <article
             class="runbook-card reveal searchable"
             data-search="terraform aws gcp azure oci plan"
           >
             <h3>Terraform Apply Pattern</h3>
-            <pre id="cmd-tf"><code>cd infra/terraform/environments/aws
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+                <button class="copy-btn" data-copy-target="cmd-tf" type="button">Copy</button>
+              </div>
+              <pre id="cmd-tf"><code>cd infra/terraform/environments/aws
 cp terraform.tfvars.example terraform.tfvars
 terraform init
 terraform plan
 terraform apply</code></pre>
-            <button class="copy-btn" data-copy-target="cmd-tf" type="button">Copy</button>
+            </div>
           </article>
           <article class="runbook-card reveal searchable" data-search="docker compose local stack">
             <h3>Container Stack</h3>
-            <pre id="cmd-compose"><code>docker compose up --build</code></pre>
-            <button class="copy-btn" data-copy-target="cmd-compose" type="button">Copy</button>
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+                <button class="copy-btn" data-copy-target="cmd-compose" type="button">Copy</button>
+              </div>
+              <pre id="cmd-compose"><code>docker compose up --build</code></pre>
+            </div>
           </article>
         </div>
       </section>
@@ -1077,27 +1113,51 @@ terraform apply</code></pre>
         <div class="runbook-grid">
           <article class="runbook-card reveal searchable" data-search="smoke api verify">
             <h3>Smoke API</h3>
-            <pre><code>bash scripts/smoke_api.sh http://127.0.0.1:8000</code></pre>
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+              </div>
+              <pre><code>bash scripts/smoke_api.sh http://127.0.0.1:8000</code></pre>
+            </div>
           </article>
           <article class="runbook-card reveal searchable" data-search="ready endpoint verify">
             <h3>Readiness Verification</h3>
-            <pre><code>curl -i http://127.0.0.1:8000/ready</code></pre>
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+              </div>
+              <pre><code>curl -i http://127.0.0.1:8000/ready</code></pre>
+            </div>
           </article>
           <article
             class="runbook-card reveal searchable"
             data-search="jenkins parameters provider strategy"
           >
             <h3>Jenkins Inputs</h3>
-            <pre><code>CLOUD_PROVIDER=(aws|gcp|azure|oci)
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+              </div>
+              <pre><code>CLOUD_PROVIDER=(aws|gcp|azure|oci)
 DEPLOY_STRATEGY=(rolling|canary|bluegreen)
 RUN_TERRAFORM_APPLY=(true|false)
 IMAGE_TAG=(optional)</code></pre>
+            </div>
           </article>
           <article class="runbook-card reveal searchable" data-search="incident response rollback">
             <h3>Incident Response</h3>
-            <pre><code>kubectl argo rollouts abort yts-api -n yts-prod
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-dots"><span></span><span></span><span></span></div>
+                <span class="code-window-title">Terminal</span>
+              </div>
+              <pre><code>kubectl argo rollouts abort yts-api -n yts-prod
 kubectl argo rollouts abort yts-frontend -n yts-prod
 kubectl argo rollouts undo yts-api -n yts-prod</code></pre>
+            </div>
           </article>
         </div>
       </section>
