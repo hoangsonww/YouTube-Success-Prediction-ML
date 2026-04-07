@@ -582,35 +582,104 @@ a {
   padding: 1rem;
 }
 
-.runbook-card pre {
-  margin: 0.7rem 0 0;
-  background: rgba(6, 12, 24, 0.85);
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(166, 186, 233, 0.2);
-  padding: 0.75rem;
-  overflow-x: auto;
-}
-
 .runbook-card code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color: #d4e1ff;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.runbook-card pre {
+  margin: 0;
+  background: rgba(6, 12, 24, 0.92);
+  padding: 0.85rem;
+  overflow-x: auto;
+  border: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.code-window {
+  margin-top: 0.7rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(166, 186, 233, 0.2);
+  background: rgba(6, 12, 24, 0.92);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.code-window-header {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  background: linear-gradient(180deg, rgba(40, 52, 78, 0.7), rgba(30, 42, 65, 0.6));
+  border-bottom: 1px solid rgba(166, 186, 233, 0.1);
+  gap: 0.5rem;
+}
+
+.code-window-dots {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.code-window-dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.code-window-dots span:nth-child(1) {
+  background: #ff5f57;
+}
+
+.code-window-dots span:nth-child(2) {
+  background: #febc2e;
+}
+
+.code-window-dots span:nth-child(3) {
+  background: #28c840;
+}
+
+.code-window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  opacity: 0.7;
+  user-select: none;
 }
 
 .copy-btn {
-  margin-top: 0.65rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.42rem 0.72rem;
-  background: rgba(79, 149, 255, 0.18);
-  color: var(--text);
+  border: 1px solid rgba(166, 186, 233, 0.22);
+  border-radius: 6px;
+  padding: 0.22rem 0.55rem;
+  background: rgba(79, 149, 255, 0.14);
+  color: var(--text-dim);
   cursor: pointer;
   font-weight: 600;
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background: rgba(79, 149, 255, 0.28);
+  color: var(--text);
+  border-color: rgba(166, 186, 233, 0.4);
 }
 
 .copy-btn.copied {
   background: rgba(106, 224, 164, 0.2);
   border-color: rgba(106, 224, 164, 0.45);
+  color: var(--ok);
+}
+
+.code-window pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
 }
 
 .timeline {
@@ -851,7 +920,7 @@ a {
   .feature-card,
   .chart-card,
   .runbook-card,
-  .doc-card {
+  .docs-grid .doc-card {
     grid-column: span 6;
   }
 }
@@ -934,7 +1003,7 @@ a {
   .feature-card,
   .chart-card,
   .runbook-card,
-  .doc-card {
+  .docs-grid .doc-card {
     grid-column: span 12;
   }
 
